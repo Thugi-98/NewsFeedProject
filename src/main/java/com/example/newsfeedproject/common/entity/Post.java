@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "posts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post {
+public class Post extends BaseEntity {
     //속성
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +27,8 @@ public class Post {
         this.user = user;
     }
     //기능
-
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
