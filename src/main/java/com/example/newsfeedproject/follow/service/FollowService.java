@@ -1,4 +1,4 @@
 package com.example.newsfeedproject.follow.service;
 
-public class Service {
+public class FollowService {
 }

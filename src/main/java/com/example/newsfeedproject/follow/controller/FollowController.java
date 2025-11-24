@@ -1,4 +1,4 @@
 package com.example.newsfeedproject.follow.controller;
 
-public class Controller {
+public class FollowController {
 }

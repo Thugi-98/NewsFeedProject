@@ -1,4 +1,4 @@
 package com.example.newsfeedproject.follow.repository;
 
-public interface Repository {
+public interface FollowRepository {
 }
