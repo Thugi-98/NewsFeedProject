@@ -1,56 +1,49 @@
 package com.example.newsfeedproject;
 
-import com.example.basic.entity.Course;
-import com.example.basic.entity.Student;
-import com.example.basic.repository.CourseRepository;
-import com.example.basic.repository.StudentRepository;
+import com.example.newsfeedproject.common.entity.Post;
+import com.example.newsfeedproject.common.entity.User;
+import com.example.newsfeedproject.post.repository.PostRepository;
+import com.example.newsfeedproject.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    private final CourseRepository courseRepository;
-    private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
-    public DataInitializer(CourseRepository courseRepository, StudentRepository studentRepository) {
-        this.courseRepository = courseRepository;
-        this.studentRepository = studentRepository;
+    public DataInitializer(
+            UserRepository userRepository,
+            PostRepository postRepository
+    ) {
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        // 수업 3개 준비
-        Course backend = new Course("backend");
-        Course frontend = new Course("frontend");
-        Course pm = new Course("pm");
+        // 유저 없으면 생성
+        if (userRepository.count() == 0) {
+            User u1 = new User("user1", "user1@test.com", "1234", LocalDate.of(2001,6,11), "ㅎㅇ");
+            User u2 = new User("user2", "user2@test.com", "12345", LocalDate.of(2000,5,12), "해윙");
+            User u3 = new User("user3", "user3@test.com", "123456", LocalDate.of(2001,2,8), "할로");
 
-        // 학생 6명 준비
-        // - backend 수업에 속한 학생 목록
-        Student gygim = new Student("gygim", "gygim@example.com", 10, backend);
-        Student steve = new Student("steve", "steve@example.com", 11, backend);
-        Student alice = new Student("alice", "alice@example.com", 12, backend);
+            userRepository.save(u1);
+            userRepository.save(u2);
+            userRepository.save(u3);
+        }
 
-        // - frontend 수업에 속한 학생 목록
-        Student isac = new Student("isac", "isac@example.com", 13, frontend);
-        Student michell = new Student("michelle", "michelle@example.com", 14, frontend);
+        // 게시글 없으면 생성
+        if (postRepository.count() == 0) {
+            User writer = userRepository.findAll().get(0);
 
-        // - pm 수업에 속한 학생 목록
-        Student ian = new Student("ian", "ian@example.com", 15, pm);
-
-        // 수업 생성
-        courseRepository.save(backend);
-        courseRepository.save(frontend);
-        courseRepository.save(pm);
-
-        // 학생 생성
-        studentRepository.save(gygim);
-        studentRepository.save(steve);
-        studentRepository.save(alice);
-        studentRepository.save(isac);
-        studentRepository.save(michell);
-        studentRepository.save(ian);
+            postRepository.save(new Post("제목1", "내용1", writer));
+            postRepository.save(new Post("제목2", "내용2", writer));
+        }
     }
 }
