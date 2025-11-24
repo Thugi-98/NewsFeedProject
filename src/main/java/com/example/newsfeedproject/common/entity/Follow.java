@@ -19,6 +19,7 @@ public class Follow extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
+    @ManyToOne
     @JoinColumn(name = "targetId", nullable = false)
     private User target;
 
