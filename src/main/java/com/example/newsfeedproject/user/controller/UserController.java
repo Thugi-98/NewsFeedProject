@@ -1,4 +1,4 @@
 package com.example.newsfeedproject.user.controller;
 
-public class Controller {
+public class UserController {
 }
