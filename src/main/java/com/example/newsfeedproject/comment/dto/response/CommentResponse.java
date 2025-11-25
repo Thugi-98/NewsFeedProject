@@ -1,4 +1,4 @@
-package com.example.newsfeedproject.comment.dto;
+package com.example.newsfeedproject.comment.dto.response;
 
 import com.example.newsfeedproject.common.entity.Comment;
 import lombok.AllArgsConstructor;

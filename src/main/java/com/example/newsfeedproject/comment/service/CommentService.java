@@ -1,8 +1,8 @@
 package com.example.newsfeedproject.comment.service;
 
-import com.example.newsfeedproject.comment.dto.CommentResponse;
-import com.example.newsfeedproject.comment.dto.CreateCommentRequest;
-import com.example.newsfeedproject.comment.dto.UpdateCommentRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentResponse;
+import com.example.newsfeedproject.comment.dto.request.CreateCommentRequest;
+import com.example.newsfeedproject.comment.dto.request.UpdateCommentRequest;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.entity.Post;

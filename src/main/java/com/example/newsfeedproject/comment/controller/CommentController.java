@@ -1,8 +1,8 @@
 package com.example.newsfeedproject.comment.controller;
 
-import com.example.newsfeedproject.comment.dto.CommentResponse;
-import com.example.newsfeedproject.comment.dto.CreateCommentRequest;
-import com.example.newsfeedproject.comment.dto.UpdateCommentRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentResponse;
+import com.example.newsfeedproject.comment.dto.request.CreateCommentRequest;
+import com.example.newsfeedproject.comment.dto.request.UpdateCommentRequest;
 import com.example.newsfeedproject.comment.service.CommentService;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.example.newsfeedproject.comment.dto;
+package com.example.newsfeedproject.comment.dto.request;
 
 import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.entity.Post;
@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;;import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;;
 
 @Getter
 @NoArgsConstructor
