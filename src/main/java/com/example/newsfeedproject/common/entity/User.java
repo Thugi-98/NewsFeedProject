@@ -1,5 +1,6 @@
 package com.example.newsfeedproject.common.entity;
 
+import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,4 +31,7 @@ public class User extends BaseEntity {
         this.introduction = introduction;
     }
 
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
