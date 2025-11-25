@@ -44,7 +44,7 @@ public class AuthService {
                 request.getEmail(),
                 encodedPassword,
                 request.getBirth(),
-                request.getIntroduce()
+                request.getIntroduction()
         );
 
         userRepository.save(user);

@@ -20,14 +20,14 @@ public class User extends BaseEntity {
     private String email;
     private String password;
     private LocalDate birth;
-    private String introduce;
+    private String introduction;
 
-    public User(String name, String email, String password, LocalDate birth, String introduce) {
+    public User(String name, String email, String password, LocalDate birth, String introduction) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.birth = birth;
-        this.introduce = introduce;
+        this.introduction = introduction;
     }
 
 }

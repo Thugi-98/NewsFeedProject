@@ -32,6 +32,6 @@ public class CreateUserRequest {
     private LocalDate birth;
 
     @Size(max = 100, message = "소개글은 100자 이하여야 합니다.")
-    private String introduce;
+    private String introduction;
 
 }

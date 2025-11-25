@@ -32,7 +32,7 @@ public class CreateUserResponse {
                 user.getName(),
                 user.getEmail(),
                 user.getBirth(),
-                user.getIntroduce(),
+                user.getIntroduction(),
                 user.getCreatedAt(),
                 user.getModifiedAt()
         );
