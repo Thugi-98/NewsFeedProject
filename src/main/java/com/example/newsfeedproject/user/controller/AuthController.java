@@ -29,7 +29,7 @@ public class AuthController {
      * 회원 가입 엔드포인트를 담당합니다.
      */
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<CreateUserResponse>> signup(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<ApiResponse<CreateUserResponse>> signupApi(@Valid @RequestBody CreateUserRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

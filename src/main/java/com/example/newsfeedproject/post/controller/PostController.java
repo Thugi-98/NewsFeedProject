@@ -14,17 +14,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class PostController {
-    //속성
+
     private final PostService postService;
 
-    //기능
-    //게시물 생성
+    /**
+     * 일정 생성 기능
+     * @param request
+     * @return
+     */
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<CreatePostResponse>> create(@RequestBody CreatePostRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request)));
     }
 
-    //게시물 조회
+    /**
+     * 일정 조회 기능
+     * @param pageable
+     * @param userId
+     * @param all
+     * @return
+     */
     @GetMapping("/posts")
     public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(
             @PageableDefault(size = 10) Pageable pageable,
@@ -34,7 +43,12 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
     }
 
-    //게시물 수정
+    /**
+     * 일정 수정 기능
+     * @param request
+     * @param postId
+     * @return
+     */
     @PutMapping("/posts/{postId}")
     public ResponseEntity<ApiResponse<UpdatePostResponse>> update(
             @RequestBody UpdatePostRequest request,
@@ -43,7 +57,12 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.update(request, postId)));
     }
 
-    //게시물 삭제
+    /**
+     * 일정 삭제 기능
+     * @param request
+     * @param postId
+     * @return
+     */
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestBody DeletePostRequest request,

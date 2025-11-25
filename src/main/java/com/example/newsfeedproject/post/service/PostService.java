@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.post.service;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
@@ -19,11 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class PostService {
-    //속성
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    //기능
+    /**
+     * 일정 생성 기능
+     * @param request
+     * @return
+     */
     public CreatePostResponse save(CreatePostRequest request) {
         User user = userRepository.findById(request.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
@@ -42,6 +46,13 @@ public class PostService {
         );
     }
 
+    /**
+     * 일정 조회 기능
+     * @param pageable
+     * @param userId
+     * @param all
+     * @return
+     */
     public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, boolean all) {
 
         PageRequest request;
@@ -71,6 +82,12 @@ public class PostService {
         ));
     }
 
+    /**
+     * 일정 수정 기능
+     * @param request
+     * @param postId
+     * @return
+     */
     public UpdatePostResponse update(UpdatePostRequest request, Long postId) {
         Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
@@ -92,6 +109,11 @@ public class PostService {
         );
     }
 
+    /**
+     * 일정 삭제 기능
+     * @param postId
+     * @param request
+     */
     public void delete(Long postId, DeletePostRequest request) {
         Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
@@ -102,6 +124,6 @@ public class PostService {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        post.isDelete();
+        post.softDelete();
     }
 }
