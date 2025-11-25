@@ -45,7 +45,7 @@ public class CommentController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(commentService.updateComment(id,request)));
+                .body(ApiResponse.success(commentService.updateCommentApi(id,request)));
     }
 
     @DeleteMapping("/{id}")
