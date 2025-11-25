@@ -13,30 +13,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/follows")
 @RequiredArgsConstructor
 public class FollowController {
 
     private final FollowService followService;
 
     /* 다른 사람 팔로우 하기 */
-    @PostMapping("/follows")
-    public ResponseEntity<ApiResponse<CreateFollowResponse>> createFollow(
+    @PostMapping
+    public ResponseEntity<ApiResponse<CreateFollowResponse>> followApi(
             @RequestBody CreateFollowRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(followService.create(request)));
     }
 
     /* userId를 통해 팔로우 목록 확인하기 */
-    @GetMapping("/follows")
-    public ResponseEntity<ApiResponse<List<ReadFollowResponse>>> readFollow(
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ReadFollowResponse>>> followingApi(
             @RequestParam Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(followService.read(userId)));
     }
 
     /* followId를 통해 언팔로우 하기 */
-    @DeleteMapping("/follows")
-    public ResponseEntity<Void> deletePlan(
+    @DeleteMapping
+    public ResponseEntity<Void> unfollowApi(
             @RequestParam Long userId,
             @RequestParam Long targetId
     ) {

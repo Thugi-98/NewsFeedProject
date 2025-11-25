@@ -9,11 +9,14 @@ public class ReadFollowResponse {
     private final Long userId;
     private final Long targetId;
     private final String targetName;
+    private final String email;
 
-    public ReadFollowResponse(Long id, Long userId, Long targetId, String targetName) {
+    public ReadFollowResponse(Long id, Long userId, Long targetId, String targetName, String email) {
         this.id = id;
         this.userId = userId;
         this.targetId = targetId;
         this.targetName = targetName;
+        this.email = email;
+
     }
 }

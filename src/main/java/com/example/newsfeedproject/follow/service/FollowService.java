@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.follow.service;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.Follow;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
@@ -28,22 +28,7 @@ public class FollowService {
     @Transactional
     public @Nullable CreateFollowResponse create(CreateFollowRequest request) {
 
-        /* 1. 예외가 발생되는 경우인지 먼저 확인하기 */
-        List<Follow> follows = followRepository.findAll();
-
-        /* 1-1. 내가 나를 팔로우하는 경우 - userId와 TargetId가 동일한지 조회 */
-        if (request.getUserId().equals(request.getTargetId())) {
-            throw new CustomException(ErrorCode.NOT_FOUND_USER);
-        }
-
-        /* 1-2. 이미 팔로우되어 있는 경우 */
-        for (Follow follow : follows) {
-            if (follow.getUser().getId().equals(request.getUserId()) && follow.getTarget().getId().equals(request.getTargetId())) {
-                throw new CustomException(ErrorCode.NOT_FOUND_USER);
-            }
-        }
-
-        /* 2. 팔로우 하는 유저가 존재하는지 확인 - user와 target이 존재하는 유저인지 확인 */
+        /* 1. 팔로우 하는 유저가 존재하는지 확인 - user와 target이 존재하는 유저인지 확인 */
         User user = userRepository.findById(request.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
@@ -51,11 +36,26 @@ public class FollowService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
+        /* 2. 예외가 발생되는 경우인지 확인을 위해 follow 전체 목록 불러오기 */
+        List<Follow> follows = followRepository.findAll();
+
+        /* 2-1. 내가 나를 팔로우하는 경우 - userId와 TargetId가 동일한지 검증 */
+        if (request.getUserId().equals(request.getTargetId())) {
+            throw new CustomException(ErrorCode.CANT_FOLLOW_MYSELF);
+        }
+
+        /* 2-2. 이미 팔로우되어 있는 경우 */
+        for (Follow follow : follows) {
+            if (follow.getUser().getId().equals(request.getUserId()) && follow.getTarget().getId().equals(request.getTargetId())) {
+                throw new CustomException(ErrorCode.ALREADY_FOLLOW);
+            }
+        }
+
         /* 3. 검증이 완료될 경우 팔로우하기 */
         Follow follow = new Follow(user, target);
         followRepository.save(follow);
 
-        return new CreateFollowResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName());
+        return new CreateFollowResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail());
     }
 
     /* READ - 특정 유저가 팔로우하는 유저 목록 확인하기 */
@@ -69,7 +69,7 @@ public class FollowService {
         List<ReadFollowResponse> dtos = new ArrayList<>();
         for (Follow follow : follows) {
             if (follow.getUser().getId().equals(userId))
-                dtos.add(new ReadFollowResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName()));
+                dtos.add(new ReadFollowResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail()));
         }
 
         return dtos;
