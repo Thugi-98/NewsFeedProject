@@ -1,6 +1,5 @@
 package com.example.newsfeedproject.common.exception;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
 import lombok.Getter;
 
 // 커스텀 에러 클래스

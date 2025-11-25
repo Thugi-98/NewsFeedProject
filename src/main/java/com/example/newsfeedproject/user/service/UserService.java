@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.user.service;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.user.dto.UserDto;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -24,34 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-//    // 유저 생성 (임의)
-//    public CreateUserResponse createUser(CreateUserRequest request) {
-//
-//        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-//            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-//        }
-//
-//        User user = new User(
-//                request.getName(),
-//                request.getEmail(),
-//                passwordEncoder.encode(request.getPassword()),
-//                request.getBirth(),
-//                request.getIntroduction());
-//
-//        User savedUser = userRepository.save(user);
-//
-//        return new CreateUserResponse(
-//                savedUser.getId(),
-//                savedUser.getName(),
-//                savedUser.getEmail(),
-//                savedUser.getBirth(),
-//                savedUser.getIntroduction(),
-//                savedUser.getCreatedAt(),
-//                savedUser.getModifiedAt()
-//        );
-//    }
-
 
     // 유저 조회 (선택 조회)
     @Transactional(readOnly = true)

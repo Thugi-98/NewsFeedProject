@@ -1,7 +1,7 @@
 package com.example.newsfeedproject.common.security.jwt;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.dto.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,8 +1,7 @@
 package com.example.newsfeedproject.common.security.jwt;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.dto.ErrorResponse;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

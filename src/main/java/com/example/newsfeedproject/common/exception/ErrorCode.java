@@ -1,4 +1,4 @@
-package com.example.newsfeedproject.common.dto;
+package com.example.newsfeedproject.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

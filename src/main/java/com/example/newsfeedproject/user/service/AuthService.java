@@ -1,8 +1,8 @@
 package com.example.newsfeedproject.user.service;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.exception.CustomException;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
-import com.example.newsfeedproject.common.exception.DuplicatedUserException;
 import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
 import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
 import com.example.newsfeedproject.user.repository.UserRepository;
@@ -34,7 +34,7 @@ public class AuthService {
         // 이미 가입된 이메일일 경우 예외 발생
         if (userRepository.existsByEmail((request.getEmail()))) {
             log.error("이미 가입된 이메일입니다. {}", ErrorCode.DUPLICATE_EMAIL);
-            throw new DuplicatedUserException(ErrorCode.DUPLICATE_EMAIL);
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         // 비밀번호 암호화
