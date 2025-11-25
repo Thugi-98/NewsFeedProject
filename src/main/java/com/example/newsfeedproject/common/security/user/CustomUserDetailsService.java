@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * UserDetailsService를 구현한 사용자 정보를 찾아주는 클래스
+ * UserDetailsService를 구현한 사용자 정보를 찾아주는 서비스 클래스
  */
 @Slf4j
 @Service
