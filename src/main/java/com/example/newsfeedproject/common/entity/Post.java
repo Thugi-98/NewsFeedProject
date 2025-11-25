@@ -16,7 +16,7 @@ public class Post extends BaseEntity {
     private Long id;
     private String title;
     private String content;
-
+    private boolean isDelte = false;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

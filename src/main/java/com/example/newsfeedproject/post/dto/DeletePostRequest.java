@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class DeletePostRequest {
-    private String password;
+
+    private Long userId;
 }

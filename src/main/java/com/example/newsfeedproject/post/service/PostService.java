@@ -1,6 +1,5 @@
 package com.example.newsfeedproject.post.service;
 
-import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.dto.ErrorCode;
 import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
@@ -9,7 +8,6 @@ import com.example.newsfeedproject.post.dto.*;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +24,8 @@ public class PostService {
     private final UserRepository userRepository;
 
     //기능
-    public CreatePostResponse save(CreatePostRequest request, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public CreatePostResponse save(CreatePostRequest request) {
+        User user = userRepository.findById(request.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
@@ -44,11 +42,17 @@ public class PostService {
         );
     }
 
-    public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId) {
-        PageRequest request = PageRequest.of(pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+    public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, boolean all) {
+
+        PageRequest request;
+        if (all) {
+            request = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else {
+            request = PageRequest.of(pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt")
+            );
+        }
 
         Page<Post> posts;
         if (userId != null) {
@@ -72,6 +76,11 @@ public class PostService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
+        User user = post.getUser();
+        if (!user.getId().equals(request.getUserId())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
         post.update(request.getTitle(), request.getContent());
         return new UpdatePostResponse(
                 post.getId(),
@@ -89,8 +98,9 @@ public class PostService {
         );
 
         User user = post.getUser();
-        if(!user.getPassword().equals(request.getPassword())) {
-            throw new CustomException(ErrorCode.LOGIN_FAIL);
+
+        if (!user.getId().equals(request.getUserId())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
         postRepository.delete(post);

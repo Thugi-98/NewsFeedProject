@@ -20,15 +20,16 @@ public class PostController {
     //기능
     //게시물 생성
     @PostMapping("/posts")
-    public ResponseEntity<ApiResponse<CreatePostResponse>> create(@RequestBody CreatePostRequest request, Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request, userId)));
+    public ResponseEntity<ApiResponse<CreatePostResponse>> create(@RequestBody CreatePostRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request)));
     }
 
     //게시물 조회
     @GetMapping("/posts")
     public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(@PageableDefault(size = 10) Pageable pageable,
-                                                                       @RequestParam(required = false) Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId)));
+                                                                       @RequestParam(required = false) Long userId,
+                                                                       @RequestParam(required = false, defaultValue = "false") boolean all) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
     }
 
     //게시물 수정
