@@ -19,7 +19,7 @@ public class Follow extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "targetId", nullable = false)
     private User target;
 
