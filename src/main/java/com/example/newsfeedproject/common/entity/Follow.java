@@ -22,7 +22,7 @@ public class Follow extends BaseEntity {
     private User user;
 
     // 팔로우를 당한 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "targetId", nullable = false)
     private User target;
 
