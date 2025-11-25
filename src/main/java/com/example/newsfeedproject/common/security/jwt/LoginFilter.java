@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.common.security.jwt;
 
-import com.example.newsfeedproject.auth.dto.LoginUserRequest;
+import com.example.newsfeedproject.user.dto.request.LoginUserRequest;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.dto.ErrorResponse;
 import jakarta.servlet.FilterChain;

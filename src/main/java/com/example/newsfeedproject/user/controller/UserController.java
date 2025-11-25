@@ -1,9 +1,7 @@
 package com.example.newsfeedproject.user.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
-import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
-import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
 import com.example.newsfeedproject.user.service.UserService;
@@ -21,11 +19,11 @@ public class UserController {
 
     private final UserService userService;
 
-    // 유저 생성 (임의)
-    @PostMapping
-    public ResponseEntity<ApiResponse<CreateUserResponse>> createUserAPi(@RequestBody CreateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userService.createUser(request)));
-    }
+//    // 유저 생성 (임의)
+//    @PostMapping
+//    public ResponseEntity<ApiResponse<CreateUserResponse>> createUserAPi(@RequestBody CreateUserRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userService.createUser(request)));
+//    }
 
 
     // 유저 조회 (선택 조회)

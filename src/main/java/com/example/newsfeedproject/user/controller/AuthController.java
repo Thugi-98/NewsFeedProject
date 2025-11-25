@@ -1,8 +1,9 @@
-package com.example.newsfeedproject.auth.controller;
+package com.example.newsfeedproject.user.controller;
 
-import com.example.newsfeedproject.auth.dto.*;
-import com.example.newsfeedproject.auth.service.AuthService;
 import com.example.newsfeedproject.common.dto.ApiResponse;
+import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
+import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
+import com.example.newsfeedproject.user.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
