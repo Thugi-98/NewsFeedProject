@@ -31,6 +31,13 @@ public class User extends BaseEntity {
         this.introduction = introduction;
     }
 
+    public void update(UpdateUserRequest request) {
+        this.name = request.getName() != null ? request.getName() : this.name;
+        this.password = request.getPassword() != null ? request.getPassword() : this.password;
+        this.birth = request.getBirth() != null ? request.getBirth() : this.birth;
+        this.introduction = request.getIntroduction() != null ? request.getIntroduction() : this.introduction;
+    }
+
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
     }

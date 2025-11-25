@@ -1,6 +1,5 @@
 package com.example.newsfeedproject.user.service;
 
-import com.example.newsfeedproject.common.config.PasswordEncoder;
 import com.example.newsfeedproject.common.dto.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
@@ -13,6 +12,7 @@ import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     // 유저 생성 (임의)
     public CreateUserResponse createUser(CreateUserRequest request) {
