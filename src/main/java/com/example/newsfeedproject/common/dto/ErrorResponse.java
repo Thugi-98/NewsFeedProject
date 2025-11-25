@@ -1,5 +1,6 @@
 package com.example.newsfeedproject.common.dto;
 
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

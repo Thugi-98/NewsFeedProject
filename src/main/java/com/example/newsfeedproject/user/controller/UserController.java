@@ -19,19 +19,11 @@ public class UserController {
 
     private final UserService userService;
 
-//    // 유저 생성 (임의)
-//    @PostMapping
-//    public ResponseEntity<ApiResponse<CreateUserResponse>> createUserAPi(@RequestBody CreateUserRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userService.createUser(request)));
-//    }
-
-
     // 유저 조회 (선택 조회)
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(userId)));
     }
-
 
     // 유저 조회 (전체 조회)
     @GetMapping
