@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
@@ -45,7 +45,7 @@ public class CommentController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(commentService.updateCommentApi(id,request)));
+                .body(ApiResponse.success(commentService.updateComment(id,request)));
     }
 
     @DeleteMapping("/{id}")
