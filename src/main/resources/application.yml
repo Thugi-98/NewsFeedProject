@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/newsfeedproject?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/test
     username: root
     password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,3 +12,5 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+  jwt:
+    secret: "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo0NTY3OA==" # 반드시 최소 32자 이상 (서명에 사용할 Secret Key)

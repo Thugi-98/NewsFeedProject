@@ -3,8 +3,11 @@ package com.example.newsfeedproject.user.repository;
 import com.example.newsfeedproject.common.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User,Long> {
+import java.util.Optional;
 
-    User findUserById(Long userId);
+public interface UserRepository extends JpaRepository<User, Long> {
 
+    boolean existsByEmail(String email);
+
+    Optional<User> findByEmail(String email);
 }
