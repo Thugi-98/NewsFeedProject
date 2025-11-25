@@ -17,9 +17,6 @@ import lombok.NoArgsConstructor;;
 @Builder
 public class CreateCommentRequest {
 
-    @NotNull(message = "유저 ID는 필수입니다.")
-    private Long userId;
-
     @NotNull(message = "게시믈 ID는 필수입니다.")
     private Long postId;
 

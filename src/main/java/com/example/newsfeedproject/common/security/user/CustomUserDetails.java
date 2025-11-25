@@ -24,6 +24,10 @@ public class CustomUserDetails implements UserDetails {
         return Collections.emptyList(); // 인가는 구현 x
     }
 
+    public Long getUserId() {
+        return user.getId();
+    }
+
     @Override
     public String getUsername() {
         return user.getEmail();

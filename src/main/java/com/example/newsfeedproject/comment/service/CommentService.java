@@ -9,6 +9,7 @@ import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
+import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -31,11 +32,16 @@ public class CommentService {
 
     // 댓글 생성
     @Transactional
-    public CommentResponse createComment(CreateCommentRequest request) {
+    public CommentResponse createComment(CreateCommentRequest request, CustomUserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(
+                        () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+                );
 
-        User user = userRepository.findUserById(request.getUserId());
-
-        Post post = postRepository.findPostById(request.getPostId());
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+        );
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
@@ -44,7 +50,7 @@ public class CommentService {
     }
 
     // 댓글 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentResponse> getCommentByPostId(Long postid) {
 
         postRepository.findById(postid);
@@ -58,9 +64,14 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public CommentResponse updateComment(Long id, UpdateCommentRequest request) {
+    public CommentResponse updateComment(Long id, UpdateCommentRequest request, CustomUserDetails userDetails) {
 
         Comment comment = findCommentById(id);
+
+        User user = comment.getUser();
+        if (!user.getEmail().equals(userDetails.getUsername())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
 
         comment.update(request.getComment());
 
@@ -69,17 +80,21 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long id) {
+    public void deleteComment(Long id, CustomUserDetails userDetails) {
 
         Comment comment = findCommentById(id);
+
+        User user = comment.getUser();
+        if (!user.getEmail().equals(userDetails.getUsername())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
 
         commentRepository.delete(comment);
     }
 
     public Comment findCommentById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> {
-                    return new CustomException(ErrorCode.NOT_FOUND_COMMENT);
-                });
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+
     }
 }
