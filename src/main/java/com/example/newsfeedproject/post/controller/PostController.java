@@ -1,6 +1,7 @@
 package com.example.newsfeedproject.post.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
+import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.post.dto.*;
 import com.example.newsfeedproject.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,24 +20,27 @@ public class PostController {
     private final PostService postService;
 
     /**
-     * 일정 생성 기능
+     * 게시물 생성 기능
      * @param request
      * @return
      */
     @PostMapping("/posts")
-    public ResponseEntity<ApiResponse<CreatePostResponse>> create(@RequestBody CreatePostRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request)));
+    public ResponseEntity<ApiResponse<CreatePostResponse>> createPostApi(
+            @RequestBody CreatePostRequest request,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request, user)));
     }
 
     /**
-     * 일정 조회 기능
+     * 게시물 조회 기능
      * @param pageable
      * @param userId
      * @param all
      * @return
      */
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(
+    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPostApi(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false, defaultValue = "false") boolean all) {
@@ -44,31 +49,32 @@ public class PostController {
     }
 
     /**
-     * 일정 수정 기능
+     * 게시물 수정 기능
      * @param request
      * @param postId
      * @return
      */
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<UpdatePostResponse>> update(
+    public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePostApi(
             @RequestBody UpdatePostRequest request,
-            @PathVariable Long postId) {
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails user) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.update(request, postId)));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.update(request, postId, user)));
     }
 
     /**
-     * 일정 삭제 기능
-     * @param request
+     * 게시물 삭제 기능
+     * @param user
      * @param postId
      * @return
      */
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @RequestBody DeletePostRequest request,
+    public ResponseEntity<ApiResponse<Void>> deletePostApi(
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long postId) {
 
-        postService.delete(postId, request);
+        postService.delete(postId, user);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
