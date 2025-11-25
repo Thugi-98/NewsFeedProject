@@ -23,7 +23,7 @@ public class PostController {
      * @return
      */
     @PostMapping("/posts")
-    public ResponseEntity<ApiResponse<CreatePostResponse>> create(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<ApiResponse<CreatePostResponse>> createPostApi(@RequestBody CreatePostRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request)));
     }
 
@@ -35,7 +35,7 @@ public class PostController {
      * @return
      */
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(
+    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPostApi(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false, defaultValue = "false") boolean all) {
@@ -50,7 +50,7 @@ public class PostController {
      * @return
      */
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<UpdatePostResponse>> update(
+    public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePostApi(
             @RequestBody UpdatePostRequest request,
             @PathVariable Long postId) {
 
@@ -64,7 +64,7 @@ public class PostController {
      * @return
      */
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponse<Void>> deletePostApi(
             @RequestBody DeletePostRequest request,
             @PathVariable Long postId) {
 
