@@ -26,25 +26,30 @@ public class PostController {
 
     //게시물 조회
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(@PageableDefault(size = 10) Pageable pageable,
-                                                                       @RequestParam(required = false) Long userId,
-                                                                       @RequestParam(required = false, defaultValue = "false") boolean all) {
+    public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPost(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false, defaultValue = "false") boolean all) {
+
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
     }
 
     //게시물 수정
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<UpdatePostResponse>> update(@RequestBody UpdatePostRequest request,
-                                                                  @PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<UpdatePostResponse>> update(
+            @RequestBody UpdatePostRequest request,
+            @PathVariable Long postId) {
+
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.update(request, postId)));
     }
 
     //게시물 삭제
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<Void>> delete(@RequestBody DeletePostRequest request,
-                                                    @PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @RequestBody DeletePostRequest request,
+            @PathVariable Long postId) {
 
-        postService.delte(postId, request);
+        postService.delete(postId, request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

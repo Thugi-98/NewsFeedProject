@@ -56,9 +56,9 @@ public class PostService {
 
         Page<Post> posts;
         if (userId != null) {
-            posts = postRepository.findByUserId(userId, request);
+            posts = postRepository.findByUserIdAndIsDeleteFalse(userId, request);
         } else {
-            posts = postRepository.findAll(request);
+            posts = postRepository.findByIsDeleteFalse(request);
         }
 
         return posts.map(post -> new GetPostsResponse(
@@ -72,7 +72,7 @@ public class PostService {
     }
 
     public UpdatePostResponse update(UpdatePostRequest request, Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(
+        Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
@@ -92,17 +92,16 @@ public class PostService {
         );
     }
 
-    public void delte(Long postId, DeletePostRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow(
+    public void delete(Long postId, DeletePostRequest request) {
+        Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
         User user = post.getUser();
-
         if (!user.getId().equals(request.getUserId())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        postRepository.delete(post);
+        post.isDelete();
     }
 }
