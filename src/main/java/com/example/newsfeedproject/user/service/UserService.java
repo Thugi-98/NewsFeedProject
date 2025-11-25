@@ -1,18 +1,16 @@
 package com.example.newsfeedproject.user.service;
 
-import com.example.newsfeedproject.common.config.PasswordEncoder;
 import com.example.newsfeedproject.common.dto.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.user.dto.UserDto;
-import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
-import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,34 +23,34 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    // 유저 생성 (임의)
-    public CreateUserResponse createUser(CreateUserRequest request) {
-
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-        }
-
-        User user = new User(
-                request.getName(),
-                request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getBirth(),
-                request.getIntroduction());
-
-        User savedUser = userRepository.save(user);
-
-        return new CreateUserResponse(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getBirth(),
-                savedUser.getIntroduction(),
-                savedUser.getCreatedAt(),
-                savedUser.getModifiedAt()
-        );
-    }
+//    // 유저 생성 (임의)
+//    public CreateUserResponse createUser(CreateUserRequest request) {
+//
+//        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+//            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+//        }
+//
+//        User user = new User(
+//                request.getName(),
+//                request.getEmail(),
+//                passwordEncoder.encode(request.getPassword()),
+//                request.getBirth(),
+//                request.getIntroduction());
+//
+//        User savedUser = userRepository.save(user);
+//
+//        return new CreateUserResponse(
+//                savedUser.getId(),
+//                savedUser.getName(),
+//                savedUser.getEmail(),
+//                savedUser.getBirth(),
+//                savedUser.getIntroduction(),
+//                savedUser.getCreatedAt(),
+//                savedUser.getModifiedAt()
+//        );
+//    }
 
 
     // 유저 조회 (선택 조회)

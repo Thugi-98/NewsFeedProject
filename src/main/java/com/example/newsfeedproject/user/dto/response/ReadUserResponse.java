@@ -17,7 +17,7 @@ public class ReadUserResponse {
     private String name;    // 이름
     private String email;   // 이메일
     private LocalDate birth;    // 생일(YYYY-mm-dd)
-    private String introduce;   // 소개
+    private String introduction;   // 소개
     private LocalDateTime createdAt;     // 유저 생성일
     private LocalDateTime modifiedAt;   // 유저 수정일
 
