@@ -1,5 +1,6 @@
 package com.example.newsfeedproject.follow.controller;
 
+import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.follow.dto.CreateFollowRequest;
 import com.example.newsfeedproject.follow.dto.CreateFollowResponse;
 import com.example.newsfeedproject.follow.dto.ReadFollowResponse;
@@ -19,26 +20,27 @@ public class FollowController {
 
     /* 다른 사람 팔로우 하기 */
     @PostMapping("/follows")
-    public ResponseEntity<CreateFollowResponse> createFollow(
+    public ResponseEntity<ApiResponse<CreateFollowResponse>> createFollow(
             @RequestBody CreateFollowRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(followService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(followService.create(request)));
     }
 
     /* userId를 통해 팔로우 목록 확인하기 */
     @GetMapping("/follows")
-    public ResponseEntity<List<ReadFollowResponse>> readFollow(
+    public ResponseEntity<ApiResponse<List<ReadFollowResponse>>> readFollow(
             @RequestParam Long userId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(followService.read(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(followService.read(userId)));
     }
 
     /* followId를 통해 언팔로우 하기 */
-    @DeleteMapping("/follows/{id}")
+    @DeleteMapping("/follows")
     public ResponseEntity<Void> deletePlan(
-            @PathVariable Long id
+            @RequestParam Long userId,
+            @RequestParam Long targetId
     ) {
-        followService.delete(id);
+        followService.delete(userId, targetId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

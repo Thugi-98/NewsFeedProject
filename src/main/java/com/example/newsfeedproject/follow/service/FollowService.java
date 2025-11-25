@@ -77,14 +77,17 @@ public class FollowService {
 
     /* DELETE - 특정 ROW 삭제 */
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long userId, Long targetId) {
 
-        /* 1. 존재하는 팔로우 아이디인지 확인 */
-        Follow follow = followRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
-        );
+        /* 1. 팔로우 목록 중 userId와 targetId가 동일한 객체 찾기 */
+        List<Follow> follows = followRepository.findAll();
 
-        /* 2. ★-=삭★제=-★ */
-        followRepository.deleteById(id);
+        /* 2. 해당 객체를 찾을 경우 바로 ★-=삭★제=-★ */
+        for (Follow follow : follows) {
+            if (follow.getUser().getId().equals(userId) && follow.getTarget().getId().equals(targetId)) {
+                followRepository.deleteById(follow.getId());
+            }
+        }
+
     }
 }
