@@ -1,5 +1,6 @@
 package com.example.newsfeedproject.post.service;
 
+import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
@@ -28,6 +29,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 게시물 생성 기능
@@ -125,7 +127,6 @@ public class PostService {
         if (!user.getEmail().equals(userDetails.getUsername())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
-
         post.softDelete();
     }
 }
