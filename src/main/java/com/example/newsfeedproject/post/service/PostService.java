@@ -90,12 +90,13 @@ public class PostService {
      * @param id
      * @return
      */
+    @Transactional(readOnly = true)
     public GetPostResponse getPost(Long id) {
         Post post = postRepository.findByIdAndIsDeleteFalse(id).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
-        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalse(post.getId());
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalse(post.getId());
 
         List<CommentResponse> commentResponses = comments.stream()
                 .map(CommentResponse::from)

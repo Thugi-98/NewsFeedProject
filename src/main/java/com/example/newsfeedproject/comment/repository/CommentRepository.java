@@ -13,9 +13,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByPostIdOrderByCreatedAtAsc(Long postid);
 
     // 댓글 개수
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId AND c.isDeleted = false")
+    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId AND c.isDelete = false")
     long countByPostId(@Param("postId") Long postId);
 
     // 댓글 목록 (필요할 때만)
-    List<Comment> findByPostIdAndIsDeletedFalse(Long postId);
+    List<Comment> findByPostIdAndIsDeleteFalse(Long postId);
 }

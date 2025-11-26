@@ -60,7 +60,7 @@ public class PostController {
      * @param id
      * @return
      */
-    @GetMapping("/posts/{Id}")
+    @GetMapping("/posts/{id}")
     public ResponseEntity<ApiResponse<GetPostResponse>> getPostApi(@PathVariable Long id) {
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPost(id)));
