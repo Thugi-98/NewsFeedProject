@@ -18,6 +18,7 @@ import java.time.LocalDate;
 @SQLRestriction("is_deleted = false")
 public class User extends BaseEntity {
 
+    // 속성
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +28,9 @@ public class User extends BaseEntity {
     private LocalDate birth;
     private String introduction;
     private boolean isDeleted = false;
+    private Boolean followPrivate = false;
 
+    // 생성자
     public User(String name, String email, String password, LocalDate birth, String introduction) {
         this.name = name;
         this.email = email;
@@ -36,14 +39,24 @@ public class User extends BaseEntity {
         this.introduction = introduction;
     }
 
+    // 속성
     public void update(UpdateUserRequest request, String newEncodedPassword) {
         // 일반 정보 업데이트
-        this.name = request.getName();
-        this.birth = request.getBirth();
-        this.introduction = request.getIntroduction();
+        if(request.getName() != null && !request.getName().trim().isEmpty()) {
+            this.name = request.getName().trim();
+        }
+        if(request.getBirth() != null) {
+            this.birth = request.getBirth();
+        }
+        if(request.getIntroduction() != null && !request.getIntroduction().trim().isEmpty()) {
+            this.introduction = request.getIntroduction().trim();
+        }
+        if(request.getFollowPrivate() != null) {
+            this.followPrivate = request.getFollowPrivate();
+        }
 
         // 비밀번호 수정값이 있는 경우에만 비밀번호를 업데이트
-        if (newEncodedPassword != null) {
+        if (newEncodedPassword != null && !newEncodedPassword.isEmpty()) {
             this.password = newEncodedPassword;
         }
     }
