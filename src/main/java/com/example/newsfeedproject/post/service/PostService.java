@@ -1,6 +1,8 @@
 package com.example.newsfeedproject.post.service;
 
+import com.example.newsfeedproject.comment.dto.response.CommentResponse;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
+import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +79,10 @@ public class PostService {
             posts = postRepository.findByIsDeleteFalse(request);
         }
 
-        return posts.map(GetPostsResponse::from);
+        return posts.map(post -> {
+            long count = commentRepository.countByPostId(post.getId());
+            return GetPostsResponse.from(post, count);
+        });
     }
 
     /**
@@ -89,11 +95,18 @@ public class PostService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
-        return GetPostResponse.from(post);
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalse(post.getId());
+
+        List<CommentResponse> commentResponses = comments.stream()
+                .map(CommentResponse::from)
+                .toList();
+
+        return GetPostResponse.from(post, commentResponses);
     }
 
     /**
-     * 일정 수정 기능
+     * 게시물 수정 기능
+     *
      * @param request
      * @param postId
      * @return

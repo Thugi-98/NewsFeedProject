@@ -13,16 +13,16 @@ public class GetPostsResponse {
     private final Long id;
     private final String userName;
     private final String title;
-    private final String content;
+    private final int commentCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public static GetPostsResponse from(Post post) {
+    public static GetPostsResponse from(Post post, long commentCount) {
         return new GetPostsResponse(
                 post.getId(),
                 post.getUser().getName(),
                 post.getTitle(),
-                post.getContent(),
+                (int) commentCount,
                 post.getCreatedAt(),
                 post.getModifiedAt()
         );
