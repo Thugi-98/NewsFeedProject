@@ -35,12 +35,12 @@ public class CommentService {
     public CommentResponse createComment(CreateCommentRequest request, CustomUserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+                        () -> new CustomException(ErrorCode.NOT_FOUND_USER)
                 );
 
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+                        () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
         Comment comment = request.toEntity(user, post);
@@ -51,11 +51,11 @@ public class CommentService {
 
     // 댓글 조회
     @Transactional(readOnly = true)
-    public List<CommentResponse> getCommentByPostId(Long postid) {
+    public List<CommentResponse> readComment(Long postId) {
 
-        postRepository.findById(postid);
+        postRepository.findById(postId);
 
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postid);
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
         return comments.stream()
                 .map(CommentResponse::from)
@@ -66,7 +66,8 @@ public class CommentService {
     @Transactional
     public CommentResponse updateComment(Long id, UpdateCommentRequest request, CustomUserDetails userDetails) {
 
-        Comment comment = findCommentById(id);
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
         User user = comment.getUser();
         if (!user.getEmail().equals(userDetails.getUsername())) {
@@ -82,7 +83,8 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long id, CustomUserDetails userDetails) {
 
-        Comment comment = findCommentById(id);
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
         User user = comment.getUser();
         if (!user.getEmail().equals(userDetails.getUsername())) {
@@ -90,11 +92,5 @@ public class CommentService {
         }
 
         commentRepository.delete(comment);
-    }
-
-    public Comment findCommentById(Long id) {
-        return commentRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
-
     }
 }
