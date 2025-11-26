@@ -10,18 +10,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
-    //속성
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 100)
     private String title;
+    @Column(length = 200)
     private String content;
     private boolean isDelete = false;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    //생성자
     public Post(String title, String content, User user) {
         this.title = title;
         this.content = content;

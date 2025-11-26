@@ -9,6 +9,7 @@ import com.example.newsfeedproject.post.dto.response.GetPostResponse;
 import com.example.newsfeedproject.post.dto.response.GetPostsResponse;
 import com.example.newsfeedproject.post.dto.response.UpdatePostResponse;
 import com.example.newsfeedproject.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public class PostController {
      */
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<CreatePostResponse>> createApi(
-            @RequestBody CreatePostRequest request,
+            @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request, user)));
@@ -74,7 +75,7 @@ public class PostController {
      */
     @PutMapping("/posts/{postId}")
     public ResponseEntity<ApiResponse<UpdatePostResponse>> updateApi(
-            @RequestBody UpdatePostRequest request,
+            @Valid @RequestBody UpdatePostRequest request,
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
