@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * 커스텀 예외 처리
-     */
+    //커스텀 예외처리
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e) {
 
@@ -23,9 +21,7 @@ public class GlobalExceptionHandler {
                         e.getErrorCode().getStatus().value(), e.getErrorCode().name(), e.getMessage())));
     }
 
-    /**
-     * 검증 예외 처리
-     */
+    // @Valid 실패 처리 (Validation 예외)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
 
@@ -49,9 +45,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    /**
-     * 나머지 예외 서버에러 처리
-     */
+    // 나머지 예외 서버에러 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
 

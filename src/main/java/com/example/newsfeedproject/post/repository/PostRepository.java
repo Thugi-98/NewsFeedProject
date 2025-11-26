@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-
     Page<Post> findByUserIdAndIsDeleteFalse(Long userId, Pageable pageable);
 
     Page<Post> findByIsDeleteFalse(Pageable pageable);
