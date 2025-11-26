@@ -36,14 +36,15 @@ public class User extends BaseEntity {
         this.introduction = introduction;
     }
 
-    public void update(UpdateUserRequest request) {
-        this.name = request.getName() != null ? request.getName() : this.name;
-        this.password = request.getPassword() != null ? request.getPassword() : this.password;
-        this.birth = request.getBirth() != null ? request.getBirth() : this.birth;
-        this.introduction = request.getIntroduction() != null ? request.getIntroduction() : this.introduction;
-    }
+    public void update(UpdateUserRequest request, String newEncodedPassword) {
+        // 일반 정보 업데이트
+        this.name = request.getName();
+        this.birth = request.getBirth();
+        this.introduction = request.getIntroduction();
 
-    public void updatePassword(String encodedPassword) {
-        this.password = encodedPassword;
+        // 비밀번호 수정값이 있는 경우에만 비밀번호를 업데이트
+        if (newEncodedPassword != null) {
+            this.password = newEncodedPassword;
+        }
     }
 }
