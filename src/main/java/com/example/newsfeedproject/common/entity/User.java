@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     private String introduction;
     private boolean isDeleted = false;
 
-    public User(String name, String email, String password, LocalDate birth, String introduce) {
+    public User(String name, String email, String password, LocalDate birth, String introduction) {
         this.name = name;
         this.email = email;
         this.password = password;
