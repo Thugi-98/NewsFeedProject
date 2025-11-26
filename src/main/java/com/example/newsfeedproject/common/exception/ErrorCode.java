@@ -25,8 +25,11 @@ public enum ErrorCode {
     WRONG_TYPE_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 타입의 토큰입니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
 
-    CANT_FOLLOW_MYSELF(HttpStatus.FORBIDDEN, "내 계정은 팔로우할 수 없습니다."),
-    ALREADY_FOLLOW(HttpStatus.CONFLICT, "해당 유저는 이미 팔로우 중입니다.")
+    CANNOT_FOLLOW_SELF(HttpStatus.FORBIDDEN, "내 계정은 팔로우할 수 없습니다."),
+    ALREADY_FOLLOWING(HttpStatus.CONFLICT, "해당 유저는 이미 팔로우 중입니다."),
+
+    FOLLOW_LIST_PRIVATE(HttpStatus.FORBIDDEN, "비공개 팔로잉 목록입니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우중인 계정이 아닙니다.")
     ;
 
     private final HttpStatus status;
