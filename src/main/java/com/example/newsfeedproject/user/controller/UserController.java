@@ -5,6 +5,7 @@ import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
 import com.example.newsfeedproject.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class UserController {
 
     // 유저 수정
     @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@PathVariable Long userId, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@Valid @PathVariable Long userId, @RequestBody UpdateUserRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(userId, request)));
     }
 
