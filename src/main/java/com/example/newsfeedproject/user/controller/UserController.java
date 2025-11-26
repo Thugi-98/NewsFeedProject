@@ -21,9 +21,9 @@ public class UserController {
     private final UserService userService;
 
     // 유저 조회 (선택 조회)
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(userId)));
+    @GetMapping("/{Id}")
+    public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long Id) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(Id)));
     }
 
     // 유저 조회 (전체 조회)
@@ -33,15 +33,15 @@ public class UserController {
     }
 
     // 유저 수정
-    @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@Valid @PathVariable Long userId, @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(userId, request)));
+    @PutMapping("/{Id}")
+    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@Valid @PathVariable Long Id, @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(Id, request)));
     }
 
     // 유저 삭제
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUserApi(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/{Id}")
+    public ResponseEntity<Void> deleteUserApi(@PathVariable Long Id) {
+        userService.deleteUser(Id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
