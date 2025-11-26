@@ -60,4 +60,13 @@ public class User extends BaseEntity {
             this.password = newEncodedPassword;
         }
     }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
+    // 이미 삭제된 유저인지 확인하는 메서드 추가 (예외 처리를 위해 사용)
+//    public boolean isDeleted() {
+//        return this.isDeleted;
+//    }
 }

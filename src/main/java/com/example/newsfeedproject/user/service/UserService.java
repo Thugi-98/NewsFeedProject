@@ -5,6 +5,7 @@ import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.user.dto.UserDto;
+import com.example.newsfeedproject.user.dto.request.DeleteUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
@@ -15,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,30 +72,30 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        // 다른 사람 정보를 수정할 수 없게 하는 기능
+        // 2. 다른 사람 정보를 수정할 수 없게 하는 기능
         if(!user.getEmail().equals(userDetails.getUsername())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        // 2. 기존 비밀번호 일치 확인 (본인 인증)
+        // 3. 기존 비밀번호 일치 확인 (본인 인증)
         // 입력된 현재 비밀번호와 유저에 저장된 암호화된 비밀번호가 일치하는지 확인
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
 
-        // 3. 정보 수정 (비밀번호 수정값 유무에 따라)
+        // 4. 정보 수정 (비밀번호 수정값 유무에 따라)
         String newEncodedPassword = null;
-        // 3-1. 비밀번호를 변경하는 경우
+        // 4-1. 비밀번호를 변경하는 경우
         if (request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {
-            // 3-1-1. 현재 비밀번호와 동일한 비밀번호로 수정하는 경우 방지
+            // 4-1-1. 현재 비밀번호와 동일한 비밀번호로 수정하는 경우 방지
             if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
                 throw new CustomException(ErrorCode.PASSWORD_IS_SAME);
             }
-            // 3-1-2. 새로운 비밀번호를 암호화하여 준비
+            // 4-1-2. 새로운 비밀번호를 암호화하여 준비
             newEncodedPassword = passwordEncoder.encode(request.getNewPassword());
         }
 
-        // 3-2. 수정 정보 업데이트
+        // 4-2. 수정 정보 업데이트
         user.update(request, newEncodedPassword);
 
         UserDto dto = UserDto.from(user);
@@ -103,16 +103,22 @@ public class UserService {
     }
 
     // 유저 삭제
-    public void deleteUser(Long userId, CustomUserDetails userDetails) {
+    public void deleteUser(DeleteUserRequest request, CustomUserDetails userDetails) {
 
-        User user = userRepository.findById(userId).orElseThrow(
+        // 1. 유저 찾기 (삭제 여부와 관계없이 조회)
+        String userEmail = userDetails.getUsername();
+
+        User user = userRepository.findByEmailWithDeleted(userEmail).orElseThrow(
                 () ->  new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
-        if(!user.getEmail().equals(userDetails.getUsername())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        // 2. 기존 비밀번호 일치 확인 (본인 인증 유지)
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
-        userRepository.delete(user);
+
+        // 3. 유저 탈퇴 (소프트 삭제)
+        user.softDelete();
     }
 
 

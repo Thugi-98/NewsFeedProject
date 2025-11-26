@@ -2,6 +2,7 @@ package com.example.newsfeedproject.user.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.user.dto.request.DeleteUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
@@ -49,10 +50,10 @@ public class UserController {
     }
 
     // 유저 삭제
-    @DeleteMapping("/{Id}")
-    public ResponseEntity<Void> deleteUserApi(@PathVariable Long Id,
-                                              @AuthenticationPrincipal CustomUserDetails user) {
-        userService.deleteUser(Id, user);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserApi(@Valid @RequestBody DeleteUserRequest request,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.deleteUser(request, userDetails);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
