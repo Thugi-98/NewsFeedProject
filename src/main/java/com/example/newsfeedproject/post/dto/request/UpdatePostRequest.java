@@ -1,9 +1,9 @@
-package com.example.newsfeedproject.post.dto;
+package com.example.newsfeedproject.post.dto.request;
 
 import lombok.Getter;
 
 @Getter
-public class CreatePostRequest {
+public class UpdatePostRequest {
 
     private String title;
     private String content;

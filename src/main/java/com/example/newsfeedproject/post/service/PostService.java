@@ -5,7 +5,12 @@ import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
-import com.example.newsfeedproject.post.dto.*;
+import com.example.newsfeedproject.post.dto.request.CreatePostRequest;
+import com.example.newsfeedproject.post.dto.request.UpdatePostRequest;
+import com.example.newsfeedproject.post.dto.response.CreatePostResponse;
+import com.example.newsfeedproject.post.dto.response.GetPostResponse;
+import com.example.newsfeedproject.post.dto.response.GetPostsResponse;
+import com.example.newsfeedproject.post.dto.response.UpdatePostResponse;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +30,9 @@ public class PostService {
     private final UserRepository userRepository;
 
     /**
-     * 일정 생성 기능
+     * 게시물 생성 기능
      * @param request
+     * @param userDetails
      * @return
      */
     public CreatePostResponse save(CreatePostRequest request, CustomUserDetails userDetails) {
@@ -37,23 +43,17 @@ public class PostService {
         Post post = new Post(request.getTitle(), request.getContent(), user);
         Post savedPost = postRepository.save(post);
 
-        return new CreatePostResponse(
-                savedPost.getId(),
-                savedPost.getUser().getName(),
-                savedPost.getTitle(),
-                savedPost.getContent(),
-                savedPost.getCreatedAt(),
-                savedPost.getModifiedAt()
-        );
+        return CreatePostResponse.from(savedPost);
     }
 
     /**
-     * 일정 조회 기능
+     * 게시물 전체 조회 기능
      * @param pageable
      * @param userId
      * @param all
      * @return
      */
+    @Transactional(readOnly = true)
     public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, boolean all) {
 
         PageRequest request;
@@ -66,6 +66,7 @@ public class PostService {
             );
         }
 
+
         Page<Post> posts;
         if (userId != null) {
             posts = postRepository.findByUserIdAndIsDeleteFalse(userId, request);
@@ -73,14 +74,20 @@ public class PostService {
             posts = postRepository.findByIsDeleteFalse(request);
         }
 
-        return posts.map(post -> new GetPostsResponse(
-                post.getId(),
-                post.getUser().getName(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getModifiedAt()
-        ));
+        return posts.map(GetPostsResponse::from);
+    }
+
+    /**
+     * 게시물 단건 조회 기능
+     * @param id
+     * @return
+     */
+    public GetPostResponse getPost(Long id) {
+        Post post = postRepository.findByIdAndIsDeleteFalse(id).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+        );
+
+        return GetPostResponse.from(post);
     }
 
     /**
@@ -100,14 +107,8 @@ public class PostService {
         }
 
         post.update(request.getTitle(), request.getContent());
-        return new UpdatePostResponse(
-                post.getId(),
-                post.getUser().getName(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getModifiedAt()
-        );
+
+        return UpdatePostResponse.from(post);
     }
 
     /**

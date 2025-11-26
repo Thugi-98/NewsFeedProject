@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     private LocalDate birth;
     private String introduction;
 
-    public User(String name, String email, String password, LocalDate birth, String introduce) {
+    public User(String name, String email, String password, LocalDate birth, String introduc) {
         this.name = name;
         this.email = email;
         this.password = password;

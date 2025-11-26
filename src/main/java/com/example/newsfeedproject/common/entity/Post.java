@@ -27,12 +27,24 @@ public class Post extends BaseEntity {
         this.content = content;
         this.user = user;
     }
-    //기능
+
+    /**
+     * 업데이트 기능
+     * @param title
+     * @param content
+     */
     public void update(String title, String content) {
-        this.title = title;
-        this.content = content;
+        if(title != null && !title.trim().isEmpty()) {
+            this.title = title.trim();
+        }
+        if(content != null && !content.trim().isEmpty()) {
+        this.content = content.trim();
+        }
     }
 
+    /**
+     * 삭제기능
+     */
     public void softDelete() {
         this.isDelete = true;
     }
