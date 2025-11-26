@@ -3,7 +3,7 @@ package com.example.newsfeedproject.user.controller;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
-import com.example.newsfeedproject.common.security.jwt.JWTUtil;
+import com.example.newsfeedproject.common.security.utils.JwtUtil;
 import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
 import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
 import com.example.newsfeedproject.user.service.AuthService;
@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class AuthController {
 
     private final AuthService authService;
-    private final JWTUtil jWTUtil;
+    private final JwtUtil jWTUtil;
 
     /**
      * 회원 가입 엔드포인트를 담당한다.
@@ -81,7 +81,7 @@ public class AuthController {
             throw new CustomException(ErrorCode.WRONG_TYPE_TOKEN);
         }
 
-        String email = jWTUtil.getEmail(refreshToken);
+        String email = jWTUtil.extractEmail(refreshToken);
 
         // AccessToken 재발급
         String newAccessToken = jWTUtil.createAccessToken(email);

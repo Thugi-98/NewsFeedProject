@@ -1,6 +1,7 @@
 package com.example.newsfeedproject.common.security.jwt;
 
 import com.example.newsfeedproject.common.security.user.CustomUserDetailsService;
+import com.example.newsfeedproject.common.security.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,9 +25,9 @@ import java.util.Collections;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
     @Override
@@ -69,7 +70,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         // 최종적으로 token 검증 완료 -> 일시적인 session 생성
-        String email = jwtUtil.getEmail(token);
+        String email = jwtUtil.extractEmail(token);
 
         // 인증 완료된 유저 정보 가져오기
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
