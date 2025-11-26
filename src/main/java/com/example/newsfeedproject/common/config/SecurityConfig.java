@@ -1,15 +1,12 @@
 package com.example.newsfeedproject.common.config;
 
-import com.example.newsfeedproject.common.security.jwt.JwtAuthenticationEntryPoint;
-import com.example.newsfeedproject.common.security.user.CustomLogoutHandler;
+import com.example.newsfeedproject.common.security.jwt.*;
 import com.example.newsfeedproject.common.security.user.CustomUserDetailsService;
-import com.example.newsfeedproject.common.security.jwt.JWTFilter;
-import com.example.newsfeedproject.common.security.jwt.JWTUtil;
-import com.example.newsfeedproject.common.security.jwt.LoginFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -38,7 +35,6 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
-    private final CustomLogoutHandler logoutHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     /**
@@ -104,7 +100,6 @@ public class SecurityConfig {
                 // 로그아웃
                 .logout(logout -> logout
                         .logoutUrl("/logout") // 로그아웃 처리할 URL
-                        .addLogoutHandler(logoutHandler) // 만든 핸들러 등록
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK); // 로그아웃 성공 처리
                         }))

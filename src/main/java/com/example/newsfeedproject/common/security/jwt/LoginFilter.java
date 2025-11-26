@@ -4,6 +4,7 @@ import com.example.newsfeedproject.user.dto.request.LoginUserRequest;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.dto.ErrorResponse;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -66,11 +67,22 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 인증된 사용자 정보에서 이메일 꺼내기
         String email = authResult.getName();
         
-        // JWT 토큰 생성
-        String token = jwtUtil.createJwt(email);
+        // Access Token 생성
+        String accessToken = jwtUtil.createAccessToken(email);
+
+        // Refresh Token 생성
+        String refreshToken = jwtUtil.createRefreshToken(email);
 
         // Authorization 헤더로 JWT 전달
-        response.setHeader("Authorization", token);
+        response.setHeader("Authorization", accessToken);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true); // JS에서 접근 불가
+        refreshTokenCookie.setSecure(true); // HTTPS 환경에서만 전송
+        refreshTokenCookie.setPath("/"); // 전체 경로에서 사용 가능
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+        response.addCookie(refreshTokenCookie);
+
 
         response.setStatus(HttpServletResponse.SC_NO_CONTENT); // Body 없이 204 No Content
     }

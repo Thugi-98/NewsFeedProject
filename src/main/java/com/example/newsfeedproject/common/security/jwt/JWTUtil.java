@@ -28,7 +28,8 @@ import static io.jsonwebtoken.Jwts.SIG.HS256;
 public class JWTUtil {
 
     public static final String BEARER_PREFIX = "Bearer "; // JWT 토큰 접두사
-    private final long TOKEN_TIME = 60 * 60 * 1000L; // 60분 (ms)
+    private final long ACCESS_TOKEN_TIME = 60 * 1 * 1000L; // 60분 (ms)
+    private final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 7 * 1000L; // 일주일 (ms)
     private final SecretKey secretKey; // ⚠️ 서명에 사용되는 비밀 키를 코드 내부에 하드코딩 하지 말 것, 설정 파일(application.yml)에서 관리 권장
     private final ObjectMapper objectMapper;
 
@@ -74,18 +75,31 @@ public class JWTUtil {
     }
 
     /**
-     * JWT 생성 메소드
+     * Access Token을 생성하는 메소드
      * email, 토큰 만료 시간(expiredMs)을 포함한 JWT 발급
      */
-    public String createJwt(String email) {
+    public String createAccessToken(String email) {
 
         return BEARER_PREFIX +
                 Jwts.builder()
                 .claim("email", email)
                 .issuedAt(new Date(System.currentTimeMillis()))                 // 발급 시간 설정
-                .expiration(new Date(System.currentTimeMillis() + TOKEN_TIME))   // 만료 시간 설정
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))   // 만료 시간 설정
                 .signWith(secretKey) // 비밀키를 사용하여 서명
                 .compact();
+    }
+
+    /**
+     * Refresh Token을 생성하는 메소드
+     */
+    public String createRefreshToken(String email) {
+
+        return Jwts.builder()
+                        .claim("email", email)
+                        .issuedAt(new Date(System.currentTimeMillis()))                 // 발급 시간 설정
+                        .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))   // 만료 시간 설정
+                        .signWith(secretKey) // 비밀키를 사용하여 서명
+                        .compact();
     }
 
     /**
