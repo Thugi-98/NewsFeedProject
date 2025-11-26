@@ -21,6 +21,7 @@ public class UserDto {
     private String introduction;   // 소개
     private LocalDateTime createdAt;     // 유저 생성일
     private LocalDateTime modifiedAt;   // 유저 수정일
+    private Boolean followPrivate;
 
     public static UserDto from (User user) {
         return new UserDto(
@@ -30,7 +31,8 @@ public class UserDto {
                 user.getBirth(),
                 user.getIntroduction(),
                 user.getCreatedAt(),
-                user.getModifiedAt()
+                user.getModifiedAt(),
+                user.getFollowPrivate()
         );
     }
 }

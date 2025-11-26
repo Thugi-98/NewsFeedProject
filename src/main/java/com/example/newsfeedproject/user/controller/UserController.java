@@ -1,13 +1,17 @@
 package com.example.newsfeedproject.user.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
+import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.user.dto.request.DeleteUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
 import com.example.newsfeedproject.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +24,15 @@ public class UserController {
     private final UserService userService;
 
     // 유저 조회 (선택 조회)
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(userId)));
+    @GetMapping("/{Id}")
+    public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long Id) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(Id)));
+    }
+
+    @GetMapping("/findUser")
+    public ResponseEntity<ApiResponse<List<ReadUserResponse>>> readUserByNameApi(@RequestParam("name") String name) {
+        List<ReadUserResponse> users = userService.findUserByName(name);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(users));
     }
 
     // 유저 조회 (전체 조회)
@@ -32,15 +42,18 @@ public class UserController {
     }
 
     // 유저 수정
-    @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@PathVariable Long userId, @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(userId, request)));
+    @PutMapping("/{Id}")
+    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@PathVariable Long Id,
+                                                                         @Valid @RequestBody UpdateUserRequest request,
+                                                                         @AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(Id, request, user)));
     }
 
     // 유저 삭제
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUserApi(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserApi(@Valid @RequestBody DeleteUserRequest request,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.deleteUser(request, userDetails);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
