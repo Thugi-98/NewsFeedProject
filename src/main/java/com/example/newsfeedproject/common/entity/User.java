@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -12,6 +14,8 @@ import java.time.LocalDate;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class User extends BaseEntity {
 
     @Id
@@ -22,6 +26,7 @@ public class User extends BaseEntity {
     private String password;
     private LocalDate birth;
     private String introduction;
+    private boolean isDeleted = false;
 
     public User(String name, String email, String password, LocalDate birth, String introduce) {
         this.name = name;
