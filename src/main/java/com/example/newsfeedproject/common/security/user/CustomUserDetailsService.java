@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     // email을 이용해 사용자 정보를 조회하고 사용자 정보 DTO 반환(부모 타입 반환 - 다형성)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() -> {
                     log.error("[Not Found User] 유저를 찾을 수 없습니다.");
                     return new UsernameNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage());
                 });

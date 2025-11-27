@@ -8,12 +8,12 @@ import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
-import com.example.newsfeedproject.post.dto.request.CreatePostRequest;
-import com.example.newsfeedproject.post.dto.request.UpdatePostRequest;
-import com.example.newsfeedproject.post.dto.response.CreatePostResponse;
-import com.example.newsfeedproject.post.dto.response.GetPostResponse;
-import com.example.newsfeedproject.post.dto.response.GetPostsResponse;
-import com.example.newsfeedproject.post.dto.response.UpdatePostResponse;
+import com.example.newsfeedproject.post.dto.request.PostCreateRequest;
+import com.example.newsfeedproject.post.dto.request.PostUpdateRequest;
+import com.example.newsfeedproject.post.dto.response.PostCreateResponse;
+import com.example.newsfeedproject.post.dto.response.PostGetOneResponse;
+import com.example.newsfeedproject.post.dto.response.PostGetAllResponse;
+import com.example.newsfeedproject.post.dto.response.PostUpdateResponse;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,33 +34,22 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
-    /**
-     * 게시물 생성 기능
-     * @param request
-     * @param userDetails
-     * @return
-     */
-    public CreatePostResponse save(CreatePostRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
-        );
+    // 게시물 생성 기능
+    public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUserEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Post post = new Post(request.getTitle(), request.getContent(), user);
         Post savedPost = postRepository.save(post);
 
-        return CreatePostResponse.from(savedPost);
+        return PostCreateResponse.from(savedPost);
     }
 
-    /**
-     * 게시물 전체 조회 기능
-     * @param pageable
-     * @param userId
-     * @param all
-     * @return
-     */
+    // 게시물 전체 조회 기능
     @Transactional(readOnly = true)
-    public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, boolean all) {
+    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, boolean all) {
 
+        // 페이징 없이 모든 게시물을 보기위한 조회
         PageRequest request;
         if (all) {
             request = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -71,7 +60,7 @@ public class PostService {
             );
         }
 
-
+        // 페이징 조회 시 유저 아이디의 관련된 게시물만 조회 외에는 모든 게시물을 페이징 조회
         Page<Post> posts;
         if (userId != null) {
             posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
@@ -81,20 +70,15 @@ public class PostService {
 
         return posts.map(post -> {
             long count = commentRepository.countByPostId(post.getId());
-            return GetPostsResponse.from(post, count);
+            return PostGetAllResponse.from(post, count);
         });
     }
 
-    /**
-     * 게시물 단건 조회 기능
-     * @param id
-     * @return
-     */
+    // 게시물 단건 조회 기능
     @Transactional(readOnly = true)
-    public GetPostResponse getPost(Long id) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+    public PostGetOneResponse getPost(Long id) {
+        Post post = postRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
@@ -102,44 +86,34 @@ public class PostService {
                 .map(CommentResponse::from)
                 .toList();
 
-        return GetPostResponse.from(post, commentResponses);
+        return PostGetOneResponse.from(post, commentResponses);
     }
 
-    /**
-     * 게시물 수정 기능
-     *
-     * @param request
-     * @param postId
-     * @return
-     */
-    public UpdatePostResponse update(UpdatePostRequest request, Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+    // 게시물 수정 기능
+    public PostUpdateResponse update(PostUpdateRequest request, Long postId, CustomUserDetails userDetails) {
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
         post.update(request.getTitle(), request.getContent());
         postRepository.flush();
 
-        return UpdatePostResponse.from(post);
+        return PostUpdateResponse.from(post);
     }
 
-    /**
-     * 게시물 삭제 기능
-     * @param postId
-     * @param userDetails
-     */
+    // 게시물 삭제 기능
     public void delete(Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         post.softDelete();
