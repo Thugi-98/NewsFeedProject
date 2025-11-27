@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 e.getStatusCode().value(),                // HTTP status code
-                field != null ? field : "VALIDATION_ERROR", // 어떤 필드에서 오류 났는지 표시
+                field != null ? (field.toUpperCase() + " VALIDATION ERROR") : "VALIDATION_ERROR", // 어떤 필드에서 오류 났는지 표시
                 defaultMessage != null ? defaultMessage : "Invalid request" // 실제 메시지
         );
 
