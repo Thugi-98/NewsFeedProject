@@ -76,6 +76,7 @@ public class CommentService {
         }
 
         findComment.update(request.getComment());
+        commentRepository.flush();
 
         return CommentCreateResponse.from(findComment);
     }
