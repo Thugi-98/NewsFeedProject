@@ -61,8 +61,7 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(
-                        userService.updateUser(id, request, user)));
+                .body(ApiResponse.success(userService.updateUser(id, request, user)));
 
     }
 
