@@ -6,8 +6,8 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 @AllArgsConstructor
+@Getter
 public class PostCreateResponse {
     private final Long id;
     private final String userName;

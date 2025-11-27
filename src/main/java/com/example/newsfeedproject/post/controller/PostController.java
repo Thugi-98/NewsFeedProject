@@ -32,7 +32,9 @@ public class PostController {
             @Valid @RequestBody PostCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postService.save(request, user)));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(postService.save(request, user)));
     }
 
     //게시물 전체조회 기능
@@ -65,7 +67,9 @@ public class PostController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.update(request, postId, user)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(postService.update(request, postId, user)));
     }
 
     //게시물 삭제 기능
@@ -75,6 +79,8 @@ public class PostController {
             @PathVariable Long postId)
     {
         postService.delete(postId, user);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }

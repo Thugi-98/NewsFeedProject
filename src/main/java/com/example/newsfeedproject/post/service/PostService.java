@@ -36,9 +36,8 @@ public class PostService {
 
     //게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUserEmail()).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
-        );
+        User user = userRepository.findByEmail(userDetails.getUserEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Post post = new Post(request.getTitle(), request.getContent(), user);
         Post savedPost = postRepository.save(post);
@@ -78,9 +77,8 @@ public class PostService {
     //게시물 단건 조회 기능
     @Transactional(readOnly = true)
     public PostGetOneResponse getPost(Long id) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+        Post post = postRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
@@ -93,9 +91,8 @@ public class PostService {
 
     //게시물 수정 기능
     public PostUpdateResponse update(PostUpdateRequest request, Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
         //본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
@@ -110,9 +107,8 @@ public class PostService {
 
     //게시물 삭제 기능
     public void delete(Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
         //본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
