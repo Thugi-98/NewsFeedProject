@@ -1,30 +1,27 @@
-package com.example.newsfeedproject.user.dto;
+package com.example.newsfeedproject.user.dto.response;
 
 import com.example.newsfeedproject.common.entity.User;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserGetOneResponse {
 
     private Long id;
-    private String name;    // 이름
-    private String email;   // 이메일
-    private LocalDate birth;    // 생일(YYYY-mm-dd)
-    private String introduction;   // 소개
-    private LocalDateTime createdAt;     // 유저 생성일
-    private LocalDateTime modifiedAt;   // 유저 수정일
+    private String name;
+    private String email;
+    private LocalDate birth;
+    private String introduction;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private Boolean followPrivate;
 
-    public static UserDto from (User user) {
-        return new UserDto(
+    public static UserGetOneResponse from(User user) {
+        return new UserGetOneResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
@@ -35,4 +32,5 @@ public class UserDto {
                 user.getFollowPrivate()
         );
     }
+
 }

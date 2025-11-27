@@ -1,12 +1,10 @@
 package com.example.newsfeedproject.common.entity;
 
-import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
+import com.example.newsfeedproject.user.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -14,8 +12,6 @@ import java.time.LocalDate;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted = false")
 public class User extends BaseEntity {
 
     // 속성
@@ -40,21 +36,20 @@ public class User extends BaseEntity {
     }
 
     // 속성
-    public void update(UpdateUserRequest request, String newEncodedPassword) {
+    public void update(UserUpdateRequest request, String newEncodedPassword) {
         // 일반 정보 업데이트
-        if(request.getName() != null && !request.getName().trim().isEmpty()) {
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
             this.name = request.getName().trim();
         }
-        if(request.getBirth() != null) {
+        if (request.getBirth() != null) {
             this.birth = request.getBirth();
         }
-        if(request.getIntroduction() != null && !request.getIntroduction().trim().isEmpty()) {
+        if (request.getIntroduction() != null && !request.getIntroduction().trim().isEmpty()) {
             this.introduction = request.getIntroduction().trim();
         }
-        if(request.getFollowPrivate() != null) {
+        if (request.getFollowPrivate() != null) {
             this.followPrivate = request.getFollowPrivate();
         }
-
         // 비밀번호 수정값이 있는 경우에만 비밀번호를 업데이트
         if (newEncodedPassword != null && !newEncodedPassword.isEmpty()) {
             this.password = newEncodedPassword;
@@ -64,9 +59,4 @@ public class User extends BaseEntity {
     public void softDelete() {
         this.isDeleted = true;
     }
-
-    // 이미 삭제된 유저인지 확인하는 메서드 추가 (예외 처리를 위해 사용)
-//    public boolean isDeleted() {
-//        return this.isDeleted;
-//    }
 }
