@@ -25,7 +25,6 @@ public enum ErrorCode {
 
     NOT_FOUND_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 비어 있습니다."),
     WRONG_TYPE_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 타입의 토큰입니다."),
-    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
 
     CANT_FOLLOW_MYSELF(HttpStatus.FORBIDDEN, "내 계정은 팔로우할 수 없습니다."),

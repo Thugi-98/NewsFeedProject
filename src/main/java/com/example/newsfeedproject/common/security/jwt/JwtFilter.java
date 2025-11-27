@@ -65,8 +65,9 @@ public class JwtFilter extends OncePerRequestFilter {
         // 있으면 가져옴("Bearer " 떼고)
         token = authorizationHeader.substring(7);
 
-        // 가져오고 나서 Secret Key는 내가 만든게 맞는지 검증, 만료 기간 지났는지 검증
-        if (!jwtUtil.validateToken(token)) {
+        try {
+            jwtUtil.validateToken(token);
+        } catch (CustomException e) {
             log.error("[{}] {}", ErrorCode.INVALID_TOKEN.name(), ErrorCode.INVALID_TOKEN.getMessage());
 
             CustomException customException = new CustomException(ErrorCode.INVALID_TOKEN);

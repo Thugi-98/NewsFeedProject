@@ -2,10 +2,7 @@ package com.example.newsfeedproject.common.security.utils;
 
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
@@ -61,7 +58,20 @@ public class JwtUtil {
         byte[] bytes = Base64.getDecoder().decode(secretKey); // Base64 인코딩 된 문자열인 비밀 키 디코딩
         this.key = Keys.hmacShaKeyFor(bytes); // HMAC SHA-256 알고리즘 (대칭 키)
     }
-    
+
+    /**
+     * 토큰 타입을 추출하는 메소드
+     */
+    public String extractType(String token) {
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("type", String.class);
+    }
+
     /**
      * payload(claim)에서 email을 추출하는 메소드
      */
@@ -97,6 +107,7 @@ public class JwtUtil {
 
         return BEARER_PREFIX +
                 Jwts.builder()
+                        .claim("type", "access")
                         .claim("email", email) // 이메일
                         .issuedAt(new Date(System.currentTimeMillis())) // 발급 시간 설정
                         .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME)) // 만료 시간 설정
@@ -112,6 +123,7 @@ public class JwtUtil {
 
         return BEARER_PREFIX +
                 Jwts.builder()
+                        .claim("type", "refresh")
                         .claim("email", email)
                         .issuedAt(new Date(System.currentTimeMillis()))
                         .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
@@ -144,22 +156,16 @@ public class JwtUtil {
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             log.error("[Invalid JWT signature] 유효하지 않은 JWT 서명 입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             log.error("[Expired JWT token] 만료된 JWT token 입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.error("[Unsupported JWT token] 지원되지 않는 JWT 토큰 입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (IllegalArgumentException e) {
             log.error("[JWT claims is empty] 잘못된 JWT 토큰 입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
-        return false;
     }
-    
-//    private void jwtExceptionHandler(ErrorCode errorCode, HttpServletResponse response) throws IOException {
-//        ErrorResponse errorResponse = new ErrorResponse(errorCode, errorCode.getMessage());
-//
-//        response.setStatus(errorResponse.getStatus());
-//        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//        response.setCharacterEncoding("UTF-8");
-//        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-//    }
 }

@@ -58,7 +58,7 @@ public class AuthController {
         cookie.setMaxAge(0); // 만료 처리
         response.addCookie(cookie);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/refresh-token")
