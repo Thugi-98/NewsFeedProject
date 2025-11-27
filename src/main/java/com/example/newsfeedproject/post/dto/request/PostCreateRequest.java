@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class CreatePostRequest {
+public class PostCreateRequest {
 
     @NotBlank(message = "제목을 입력해 주세요.")
     @Size(min = 1, max = 100)
