@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
@@ -19,11 +18,7 @@ import java.util.Date;
 
 import static io.jsonwebtoken.Jwts.SIG.HS256;
 
-/**
- * JWT 토큰의 생성 및 관리를 담당하는 클래스
- *
- * @author jiwon jung
- */
+// JWT 토큰의 생성 및 관리를 담당하는 클래스
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -46,18 +41,14 @@ public class JwtUtil {
     // 자바 객체 -> JSON (직렬화), JSON -> 자바 객체 (역직렬화)
     private final ObjectMapper objectMapper;
 
-    /**
-     * 의존성 주입이 이루어진 뒤에 초기화를 수행하는 메소드
-     */
+    // 의존성 주입이 이루어진 뒤에 초기화를 수행하는 메소드
     @PostConstruct
     public void init() {
         byte[] bytes = Base64.getDecoder().decode(secretKey); // Base64 인코딩 된 문자열인 비밀 키를 디코딩
         this.key = Keys.hmacShaKeyFor(bytes); // HMAC SHA-256 알고리즘 (대칭 키)
     }
 
-    /**
-     * JWT 토큰을 생성하는 메소드
-     */
+    // JWT 토큰을 생성하는 메소드
     public String createJwt(String email) {
 
         return BEARER_PREFIX +
@@ -69,9 +60,7 @@ public class JwtUtil {
                         .compact(); // JWT 토큰을 문자열로 변환하여 리턴
     }
 
-    /**
-     * payload(claim)에서 email을 추출하는 메소드
-     */
+    // payload(claim)에서 email을 추출하는 메소드
     public String extractEmail(String token) {
 
         return Jwts.parser() // JWT 문자열을 해석(파싱) 하고 검증할 파서를 생성
@@ -82,9 +71,7 @@ public class JwtUtil {
                 .get("email", String.class); // 페이로드에서 키 값이 "email"에 해당하는 값을 꺼내서 String으로 변환해서 리턴
     }
 
-    /**
-     * JWT 토큰 만료 여부를 확인하는 메소드
-     */
+    // JWT 토큰 만료 여부를 확인하는 메소드
     public Boolean isTokenExpired(String token) {
 
         return Jwts.parser()
@@ -96,9 +83,7 @@ public class JwtUtil {
                 .before(new Date()); // 현재 시간(new Date())보다 이전이면 true -> 만료 되었음을 의미
     }
 
-    /**
-     * JWT 토큰의 유효성을 검증한다.
-     */
+    // JWT 토큰의 유효성을 검증한다.
     public boolean validateToken(String token) {
 
         try {

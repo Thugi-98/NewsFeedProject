@@ -3,7 +3,6 @@ package com.example.newsfeedproject.common.config;
 import com.example.newsfeedproject.common.security.jwt.*;
 import com.example.newsfeedproject.common.security.user.CustomUserDetailsService;
 import com.example.newsfeedproject.common.security.utils.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +19,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import tools.jackson.databind.ObjectMapper;
 
 
-/**
- * Spring Security 설정 클래스
- * Spring Security는 스프링 기반 애플리케이션의 보안(인증, 권한)을 담당하는 프레임워크
- * Spring Security는 필터 기반으로 동작하기 때문에 스프링 MVC와 분리되어 동작한다.
- */
+// Spring Security 설정 클래스
+// Spring Security는 스프링 기반 애플리케이션의 보안(인증, 권한)을 담당하는 프레임워크
+// Spring Security는 필터 기반으로 동작하기 때문에 스프링 MVC와 분리되어 동작한다.
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,9 +32,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    /**
-     * UserDetailsService + PasswordEncoder 연걸해서 AuthenticationManager가 기본적으로 PasswordEncoder를 알게함
-     */
+    // UserDetailsService + PasswordEncoder 연걸해서 AuthenticationManager가 기본적으로 PasswordEncoder를 알게함
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
@@ -45,34 +40,26 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * Spring Security의 AuthenticationManger를 Bean으로 등록
-     * 로그인 시 사용자의 인증을 담당한다.
-     */
+    // Spring Security의 AuthenticationManger를 Bean으로 등록
+    // 로그인 시 사용자의 인증을 담당한다.
     @Bean
     public AuthenticationManager authenticationManager() {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /**
-     * 비밀번호 암호화를 위한 BCryptPasswordEncoder 빈 등록
-     */
+    // 비밀번호 암호화를 위한 BCryptPasswordEncoder 빈 등록
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * 직렬화, 역직렬화를 위한 ObjectMapper 빈 등록
-     */
+    // 직렬화, 역직렬화를 위한 ObjectMapper 빈 등록
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
 
-    /**
-     * Spring Security 필터 체인 설정(JWT 인증을 기반으로 한 보안 설정 적용)
-     */
+    // Spring Security 필터 체인 설정(JWT 인증을 기반으로 한 보안 설정 적용)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) {
 
@@ -97,12 +84,8 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 로그아웃
-                .logout(logout -> logout
-                        .logoutUrl("/logout") // 로그아웃 처리할 URL
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK); // 로그아웃 성공 처리
-                        }));
+                // Security 로그아웃 비활성화
+                .logout(logout -> logout.disable());
 
         return http.build(); // 체인 빌드
     }
