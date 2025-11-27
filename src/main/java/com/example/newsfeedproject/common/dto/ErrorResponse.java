@@ -1,14 +1,11 @@
 package com.example.newsfeedproject.common.dto;
 
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-/**
- * 공통 에러 응답 객체
- *
- * @author jiwon jung
- */
+// 공통 에러 응답 객체
 @Getter
 @Builder
 @AllArgsConstructor

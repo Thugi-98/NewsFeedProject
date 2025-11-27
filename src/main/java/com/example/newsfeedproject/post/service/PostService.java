@@ -1,0 +1,138 @@
+package com.example.newsfeedproject.post.service;
+
+import com.example.newsfeedproject.comment.dto.response.CommentGetAllResponse;
+import com.example.newsfeedproject.comment.repository.CommentRepository;
+import com.example.newsfeedproject.common.entity.Comment;
+import com.example.newsfeedproject.common.exception.ErrorCode;
+import com.example.newsfeedproject.common.entity.Post;
+import com.example.newsfeedproject.common.entity.User;
+import com.example.newsfeedproject.common.exception.CustomException;
+import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.follow.repository.FollowRepository;
+import com.example.newsfeedproject.like.commentLike.repository.CommentLikeRepository;
+import com.example.newsfeedproject.like.postLike.repository.PostLikeRepository;
+import com.example.newsfeedproject.post.dto.request.PostCreateRequest;
+import com.example.newsfeedproject.post.dto.request.PostUpdateRequest;
+import com.example.newsfeedproject.post.dto.response.PostCreateResponse;
+import com.example.newsfeedproject.post.dto.response.PostGetOneResponse;
+import com.example.newsfeedproject.post.dto.response.PostGetAllResponse;
+import com.example.newsfeedproject.post.dto.response.PostUpdateResponse;
+import com.example.newsfeedproject.post.repository.PostRepository;
+import com.example.newsfeedproject.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class PostService {
+
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
+
+    // 게시물 생성 기능
+    public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUserEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Post post = new Post(request.getTitle(), request.getContent(), user);
+        Post savedPost = postRepository.save(post);
+
+        return PostCreateResponse.from(savedPost);
+    }
+
+    // 게시물 전체 조회 기능
+    @Transactional(readOnly = true)
+    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, String email, boolean all, boolean onlyFollow) {
+
+        // 페이징 없이 모든 게시물을 보기위한 조회
+        PageRequest request;
+        if (all) {
+            request = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else {
+            request = PageRequest.of(pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt")
+            );
+        }
+
+        // 페이징 조회 시 유저 아이디의 관련된 게시물만 조회 외에는 모든 게시물을 페이징 조회
+        Page<Post> posts;
+        if (userId != null) {
+            posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
+        } else if (onlyFollow) {
+            Long loginnedId = userRepository.findByEmail(email).get().getId();
+            List<Long> followingId = followRepository.findTargetIdByUserId(loginnedId);
+
+            posts = postRepository.findByUserIdInAndIsDeletedFalse(followingId, request);
+        } else {
+            posts = postRepository.findByIsDeletedFalse(request);
+        }
+
+        return posts.map(post -> {
+            Long commentCount = commentRepository.countByPostId(post.getId());
+            Long postLikeCount = postLikeRepository.countByPostId(post.getId());
+            return PostGetAllResponse.from(post, postLikeCount, commentCount);
+        });
+    }
+
+    // 게시물 단건 조회 기능
+    @Transactional(readOnly = true)
+    public PostGetOneResponse getPost(Long id) {
+        Post post = postRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
+
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
+
+        List<CommentGetAllResponse> commentGetAllResponse = comments.stream()
+                .map(comment -> {
+                    Long commentLikeCount = commentLikeRepository.countByCommentId(comment.getId());
+                    return CommentGetAllResponse.from(comment, commentLikeCount);
+                })
+                .collect(Collectors.toList());
+        Long postLikeCount = postLikeRepository.countByPostId(post.getId());
+
+        return PostGetOneResponse.from(post, postLikeCount, commentGetAllResponse);
+    }
+
+    // 게시물 수정 기능
+    public PostUpdateResponse update(PostUpdateRequest request, Long postId, CustomUserDetails userDetails) {
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
+
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
+        User user = post.getUser();
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        post.update(request.getTitle(), request.getContent());
+        postRepository.flush();
+
+        return PostUpdateResponse.from(post);
+    }
+
+    // 게시물 삭제 기능
+    public void delete(Long postId, CustomUserDetails userDetails) {
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
+
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
+        User user = post.getUser();
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        post.softDelete();
+    }
+}

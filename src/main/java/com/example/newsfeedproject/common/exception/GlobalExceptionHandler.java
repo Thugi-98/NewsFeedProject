@@ -1,7 +1,8 @@
 package com.example.newsfeedproject.common.exception;
 
-import com.example.newsfeedproject.common.dto.ErrorCode;
+import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.dto.ErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,50 +11,53 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //커스텀 예외처리
+    // 커스텀 예외처리
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
-        ErrorCode errorCode = ex.getErrorCode();
+    public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e) {
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(errorCode.getStatus().value())
-                .code(errorCode.getStatus().name())
-                .message(errorCode.getMessage())
-                .build();
-
-        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ApiResponse.error(new ErrorResponse(
+                        e.getErrorCode().getStatus().value(), e.getErrorCode().name(), e.getMessage())));
     }
 
     // @Valid 실패 처리 (Validation 예외)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex
-    ) {
-        String message = "유효성 검사에 실패하였습니다.";
-        if (ex.getBindingResult().getFieldError() != null) {
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
+
+        String defaultMessage = null;
+        String field = null;
+
+        if (e.getBindingResult().getFieldError() != null) {
+            defaultMessage = e.getBindingResult().getFieldError().getDefaultMessage();
+            field = e.getBindingResult().getFieldError().getField();
         }
-        message = ex.getBindingResult().getFieldError().getDefaultMessage();
 
-        ErrorResponse response = ErrorResponse.builder()
-                .status(400)
-                .code("BAD_REQUEST")
-                .message(message)
-                .build();
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getStatusCode().value(),                // HTTP status code
+                field != null ? (field.toUpperCase() + "_VALIDATION_ERROR") : "VALIDATION_ERROR", // 어떤 필드에서 오류 났는지 표시
+                defaultMessage != null ? defaultMessage : "Invalid request" // 실제 메시지
+        );
 
-        return ResponseEntity.badRequest().body(response);
-
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(ApiResponse.error(errorResponse));
     }
+
 
     // 나머지 예외 서버에러 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .status(500)
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        System.out.println(e.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .code("INTERNAL_SERVER_ERROR")
                 .message("서버 문제로 인해 실패하였습니다.")
                 .build();
 
-        return ResponseEntity.internalServerError().body(response);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(errorResponse));
     }
-
 }
