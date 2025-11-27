@@ -28,10 +28,11 @@ public class Comment extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-
     // 댓글 내용
     @Column(nullable = false,  length = 100)
     private String comment;
+
+    private boolean isDelete = false;
 
     // 생성자
     @Builder
@@ -44,6 +45,10 @@ public class Comment extends BaseEntity{
     // 댓글 수정 메서드
     public void update(String comment) {
             this.comment = comment;
+    }
+
+    public void softDelete() {
+        this.isDelete = true;
     }
 
 }

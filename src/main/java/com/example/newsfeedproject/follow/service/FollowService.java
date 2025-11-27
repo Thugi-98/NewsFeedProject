@@ -92,7 +92,7 @@ public class FollowService {
         );
 
         /* 3-2-2. target 비공개 여부 확인 */
-        if (target.getFollowPrivate.equals(true)) {
+        if (target.getFollowPrivate().equals(true)) {
             throw new CustomException(ErrorCode.FOLLOW_LIST_PRIVATE);
         }
 

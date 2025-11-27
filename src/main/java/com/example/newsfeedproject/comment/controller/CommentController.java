@@ -25,15 +25,15 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CommentResponse>> createCommentApi(@Valid @RequestBody CreateCommentRequest request, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<ApiResponse<CommentResponse>> createCommentApi(@RequestParam Long postId, @AuthenticationPrincipal CustomUserDetails user, @Valid @RequestBody CreateCommentRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(commentService.createComment(request,user)));
+                .body(ApiResponse.success(commentService.createComment(postId,user,request)));
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> readCommentApi(@PathVariable Long postId) {
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> readCommentApi(@RequestParam Long postId) {
 
         List<CommentResponse> comments = commentService.readComment(postId);
 
