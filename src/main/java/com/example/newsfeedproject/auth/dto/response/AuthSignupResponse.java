@@ -1,4 +1,4 @@
-package com.example.newsfeedproject.user.dto.response;
+package com.example.newsfeedproject.auth.dto.response;
 
 import com.example.newsfeedproject.common.entity.User;
 import lombok.Getter;
@@ -7,14 +7,10 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * 회원가입 응답 DTO
- *
- * @author jiwon jung
- */
+// 회원가입 응답 DTO
 @Getter
 @RequiredArgsConstructor
-public class CreateUserResponse {
+public class AuthSignupResponse {
 
     private final Long id;
     private final String name;
@@ -24,10 +20,9 @@ public class CreateUserResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    // 정적 팩토리 메소드
-    public static CreateUserResponse from(User user) {
+    public static AuthSignupResponse from(User user) {
 
-        return new CreateUserResponse(
+        return new AuthSignupResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),

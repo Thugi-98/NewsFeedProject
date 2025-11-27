@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
@@ -19,25 +18,17 @@ import java.util.Date;
 
 import static io.jsonwebtoken.Jwts.SIG.HS256;
 
-/**
- * JWT 토큰의 생성, 검증, 유효성 검사, Claim 추출을 담당하는 유틸 클래스
- *
- * @author jiwon jung
- */
+// JWT 토큰의 생성 및 관리를 담당하는 클래스
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    // "소유자" 라는 뜻을 가진 JWT 토큰 접두사이며, 토큰을 가진 사람(Bearer)가 인증된 사용자라는 뜻
+    // "소유자" 라는 뜻을 가진 JWT 토큰 접두사이며, 토큰을 가진 사람(Bearer)가 인증된 사용자라는 뜻을 가짐
     private final String BEARER_PREFIX = "Bearer ";
 
-    // Access Token 만료 시간: 60분 (ms)
-    // *(11.26 21:35) 테스트를 위해  1분으로 설정
-    private final long ACCESS_TOKEN_TIME = 60 * 1 * 1000L;
-
-    // Refresh Token 만료 시간: 일주일 (ms)
-    private final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 7 * 1000L;
+    // 만료 시간: 60분 (ms)
+    private final long TOKEN_TIME = 60 * 60 * 3 * 1000L;
 
     // application.yml에 있는 secret-key를 주입받은 비밀 키
     @Value("${spring.jwt.secret-key}")
@@ -50,31 +41,26 @@ public class JwtUtil {
     // 자바 객체 -> JSON (직렬화), JSON -> 자바 객체 (역직렬화)
     private final ObjectMapper objectMapper;
 
-    /**
-     * 의존성 주입이 이루어진 뒤에 초기화를 수행하는 메소드
-     */
+    // 의존성 주입이 이루어진 뒤에 초기화를 수행하는 메소드
     @PostConstruct
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey); // Base64 인코딩 된 문자열인 비밀 키 디코딩
+        byte[] bytes = Base64.getDecoder().decode(secretKey); // Base64 인코딩 된 문자열인 비밀 키를 디코딩
         this.key = Keys.hmacShaKeyFor(bytes); // HMAC SHA-256 알고리즘 (대칭 키)
     }
 
-    /**
-     * 토큰 타입을 추출하는 메소드
-     */
-    public String extractType(String token) {
+    // JWT 토큰을 생성하는 메소드
+    public String createJwt(String email) {
 
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("type", String.class);
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .claim("email", email) // 이메일
+                        .issuedAt(new Date(System.currentTimeMillis())) // 발급 시간 설정
+                        .expiration(new Date(System.currentTimeMillis() + TOKEN_TIME)) // 만료 시간 설정
+                        .signWith(key, HS256) // 비밀 키와 알고리즘을 사용하여 서명 생성
+                        .compact(); // JWT 토큰을 문자열로 변환하여 리턴
     }
 
-    /**
-     * payload(claim)에서 email을 추출하는 메소드
-     */
+    // payload(claim)에서 email을 추출하는 메소드
     public String extractEmail(String token) {
 
         return Jwts.parser() // JWT 문자열을 해석(파싱) 하고 검증할 파서를 생성
@@ -85,9 +71,7 @@ public class JwtUtil {
                 .get("email", String.class); // 페이로드에서 키 값이 "email"에 해당하는 값을 꺼내서 String으로 변환해서 리턴
     }
 
-    /**
-     * JWT 토큰 만료 여부를 확인하는 메소드
-     */
+    // JWT 토큰 만료 여부를 확인하는 메소드
     public Boolean isTokenExpired(String token) {
 
         return Jwts.parser()
@@ -99,53 +83,7 @@ public class JwtUtil {
                 .before(new Date()); // 현재 시간(new Date())보다 이전이면 true -> 만료 되었음을 의미
     }
 
-    /**
-     * Access Token을 생성하는 메소드
-     * email, 토큰 만료 시간(expiredMs)을 포함한 JWT 발급
-     */
-    public String createAccessToken(String email) {
-
-        return BEARER_PREFIX +
-                Jwts.builder()
-                        .claim("type", "access")
-                        .claim("email", email) // 이메일
-                        .issuedAt(new Date(System.currentTimeMillis())) // 발급 시간 설정
-                        .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME)) // 만료 시간 설정
-                        .signWith(key, HS256) // 비밀 키와 알고리즘을 사용하여 서명
-                        .compact(); // JWT 토큰을 문자열로 변환하여 리턴
-    }
-
-    /**
-     * Refresh Token을 생성하는 메소드
-     * 쿠키에 담길 거라서 BEARER_PREFIX 붙이지 않음 (붙일 시 에러)
-     */
-    public String createRefreshToken(String email) {
-
-        return BEARER_PREFIX +
-                Jwts.builder()
-                        .claim("type", "refresh")
-                        .claim("email", email)
-                        .issuedAt(new Date(System.currentTimeMillis()))
-                        .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
-                        .signWith(key, HS256)
-                        .compact();
-    }
-
-    /**
-     * Bearer를 떼고 순수 토큰만 가져오는 메소드
-     */
-    public String substringToken(String token) {
-        if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-            return token.substring(7);
-        }
-
-        log.error("[Not Found Token] 토큰을 찾을 수 없습니다.");
-        throw new CustomException(ErrorCode.WRONG_TYPE_TOKEN);
-    }
-
-    /**
-     * JWT 토큰의 유효성을 검증한다.
-     */
+    // JWT 토큰의 유효성을 검증한다.
     public boolean validateToken(String token) {
 
         try {
