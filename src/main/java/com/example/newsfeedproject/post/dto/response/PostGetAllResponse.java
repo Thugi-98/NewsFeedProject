@@ -6,22 +6,23 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 @AllArgsConstructor
-public class CreatePostResponse {
+@Getter
+public class PostGetAllResponse {
+
     private final Long id;
     private final String userName;
     private final String title;
-    private final String content;
+    private final int commentCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public static CreatePostResponse from(Post post) {
-        return new CreatePostResponse(
+    public static PostGetAllResponse from(Post post, long commentCount) {
+        return new PostGetAllResponse(
                 post.getId(),
                 post.getUser().getName(),
                 post.getTitle(),
-                post.getContent(),
+                (int) commentCount,
                 post.getCreatedAt(),
                 post.getModifiedAt()
         );
