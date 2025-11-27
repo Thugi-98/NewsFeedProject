@@ -5,6 +5,5 @@ import lombok.Getter;
 @Getter
 public class CreateFollowRequest {
 
-    private Long userId;
     private Long targetId;
 }

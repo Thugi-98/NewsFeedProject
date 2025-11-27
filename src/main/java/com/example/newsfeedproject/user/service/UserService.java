@@ -3,7 +3,9 @@ package com.example.newsfeedproject.user.service;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
+import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.user.dto.UserDto;
+import com.example.newsfeedproject.user.dto.request.DeleteUserRequest;
 import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
 import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
 import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,21 @@ public class UserService {
         return ReadUserResponse.from(dto);
     }
 
+    // 유저 이름으로 조회
+    public List<ReadUserResponse> findUserByName(String name) {
+        // 1. 이름으로 유저 목록 조회하기
+        List<User> users = userRepository.findByName(name);
+
+        // 2. User 엔터티 목록을 DTO 목록으로 변환
+        if(users.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return users.stream()
+                .map(ReadUserResponse::from)
+                .collect(Collectors.toList());
+    }
+
     // 유저 조회 (전체 조회)
     @Transactional(readOnly = true)
     public List<ReadUserResponse> readUsers() {
@@ -47,48 +65,61 @@ public class UserService {
     }
 
     // 유저 수정
-    public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
+    @Transactional
+    public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request, CustomUserDetails userDetails) {
+
         // 1. 유저 찾기
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        // 2. 비밀번호 수정 로직
-        // - 현재 비밀번호 변수 : currentPassword / 새로운 비밀번호 변수: password
-        // - request.getPassword() : 새로운 비밀번호
-        // - 새로운 비밀번호가 null이 아니거나 (입력되었거나) 빈 문자열이 아닌 경우에만,'비밀번호 수정' 로직을 실행
-        // - 즉, 이름, 생일 등 다른 정보만 수정하고 싶을 때는 이 블록이 건너뛰어짐
+        // 2. 다른 사람 정보를 수정할 수 없게 하는 기능
+        if(!user.getEmail().equals(userDetails.getUsername())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
 
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+        // 3. 기존 비밀번호 일치 확인 (본인 인증)
+        // 입력된 현재 비밀번호와 유저에 저장된 암호화된 비밀번호가 일치하는지 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
 
-            // 2-1. 현재 비밀번호 일치 확인 (본인 인증)
-            // 입력된 비밀번호와 유저에 저장된 비밀번호가 일치하지 않는다면 에러 발생
-            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-                throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
-            }
-
-            // 2-2. 현재 비밀번호와 동일한 비밀번호로 수정하는 경우 방지
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        // 4. 정보 수정 (비밀번호 수정값 유무에 따라)
+        String newEncodedPassword = null;
+        // 4-1. 비밀번호를 변경하는 경우
+        if (request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {
+            // 4-1-1. 현재 비밀번호와 동일한 비밀번호로 수정하는 경우 방지
+            if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
                 throw new CustomException(ErrorCode.PASSWORD_IS_SAME);
             }
-
-            // 2-3. 세 비밀번호 암호화 및 업데이트
-            // - 이름, 생일, 소개 등 비밀번호 외의 필드를 업데이트
-            // - 비밀번호를 수정하지 않은 경우(if 블록을 건너뛴 경우)
-            String newEncodedPassword = passwordEncoder.encode(request.getPassword());
-            user.updatePassword(newEncodedPassword);
-
+            // 4-1-2. 새로운 비밀번호를 암호화하여 준비
+            newEncodedPassword = passwordEncoder.encode(request.getNewPassword());
         }
-        // 3. 일반 정보 수정
-        user.update(request);
+
+        // 4-2. 수정 정보 업데이트
+        user.update(request, newEncodedPassword);
 
         UserDto dto = UserDto.from(user);
         return UpdateUserResponse.from(dto);
     }
 
     // 유저 삭제
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
-        userRepository.delete(user);
+    public void deleteUser(DeleteUserRequest request, CustomUserDetails userDetails) {
+
+        // 1. 유저 찾기 (삭제 여부와 관계없이 조회)
+        String userEmail = userDetails.getUsername();
+
+        User user = userRepository.findByEmailWithDeleted(userEmail).orElseThrow(
+                () ->  new CustomException(ErrorCode.NOT_FOUND_USER)
+        );
+
+        // 2. 기존 비밀번호 일치 확인 (본인 인증 유지)
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 3. 유저 탈퇴 (소프트 삭제)
+        user.softDelete();
     }
+
+
 }
