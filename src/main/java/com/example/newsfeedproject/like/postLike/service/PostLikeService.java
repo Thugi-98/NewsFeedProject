@@ -100,8 +100,4 @@ public class PostLikeService {
 
         postLikeRepository.deleteById(postLike.getId());
     }
-
-//    List<PostLike> postlikes = postLikeRepository.findByPostIdAndUserId(post.getId(), user.getId()).orElseThrow(
-//            () -> new CustomException(ErrorCode.)
-//    );
 }
