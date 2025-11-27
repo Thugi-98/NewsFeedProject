@@ -9,24 +9,23 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class CommentGetAllResponse {
 
     private Long id;
     private Long postId;
-    private String userName;
+    private String CommentUserName;
     private String comment;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public static CommentGetAllResponse from(Comment comment) {
-        return CommentGetAllResponse.builder()
-                .id(comment.getId())
-                .postId(comment.getPost().getId())
-                .userName(comment.getUser().getName())
-                .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt())
-                .modifiedAt(comment.getModifiedAt())
-                .build();
+        return new CommentGetAllResponse(
+                comment.getId(),
+                comment.getPost().getId(),
+                comment.getUser().getName(),
+                comment.getComment(),
+                comment.getCreatedAt(),
+                comment.getModifiedAt()
+                );
     }
 }

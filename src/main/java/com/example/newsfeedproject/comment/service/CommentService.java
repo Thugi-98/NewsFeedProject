@@ -33,7 +33,7 @@ public class CommentService {
     // 댓글 생성
     public CommentCreateResponse createComment(Long postId, CustomUserDetails userDetails, CommentCreateRequest request) {
 
-        User findUser = userRepository.findByEmail(userDetails.getUsername())
+        User findUser = userRepository.findByEmail(userDetails.getUserEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Post findPost = postRepository.findById(postId)
@@ -42,8 +42,8 @@ public class CommentService {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
 
-        Comment newComment = request.toEntity(findUser, findPost);
-        Comment savedComment = commentRepository.save(newComment);
+        Comment comment = new Comment(findPost, findUser, request.getComment());
+        Comment savedComment = commentRepository.save(comment);
 
         return CommentCreateResponse.from(savedComment);
     }

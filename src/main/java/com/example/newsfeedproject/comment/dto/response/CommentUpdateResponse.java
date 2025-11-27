@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class CommentUpdateResponse {
 
     private Long id;
@@ -18,11 +17,11 @@ public class CommentUpdateResponse {
     private LocalDateTime modifiedAt;
 
     public static CommentUpdateResponse from(Comment comment) {
-        return CommentUpdateResponse.builder()
-                .id(comment.getId())
-                .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt())
-                .modifiedAt(comment.getModifiedAt())
-                .build();
+        return new CommentUpdateResponse(
+                comment.getId(),
+                comment.getComment(),
+                comment.getCreatedAt(),
+                comment.getModifiedAt()
+        );
     }
 }

@@ -29,7 +29,6 @@ public class Comment extends BaseEntity{
 
     private boolean isDeleted = false;
 
-    @Builder
     public Comment(Post post, User user, String comment) {
         this.post = post;
         this.user = user;
