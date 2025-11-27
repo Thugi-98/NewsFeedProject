@@ -32,8 +32,8 @@ public class CommentController {
                 .body(ApiResponse.success(commentService.createComment(request,user)));
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> readCommentApi(@PathVariable Long postId) {
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> readCommentApi(@RequestParam Long postId) {
 
         List<CommentResponse> comments = commentService.readComment(postId);
 
