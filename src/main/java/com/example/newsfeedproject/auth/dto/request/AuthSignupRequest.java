@@ -8,13 +8,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-/**
- * 회원가입 요청 DTO
- *
- * @author jiwon jung
- */
+// 회원가입 요청 DTO
 @Getter
-public class SignupUserRequest {
+public class AuthSignupRequest {
 
     @NotBlank(message = "사용자 이름은 반드시 입력해야 합니다.")
     @Size(min = 1, max = 30, message = "사용자 이름은 1자 이상 30자 이하여야 합니다.")
@@ -25,7 +21,7 @@ public class SignupUserRequest {
     public String email;
 
     @NotBlank(message = "비밀번호는 반드시 입력해야 합니다.")
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "비밀번호는 8자 이상 16자 이하 영문 대소문자, 숫자, 특수문자를 사용해야 합니다.")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]|;:'\",.<>/?]).{8,16}$", message = "비밀번호는 8자 이상 16자 이하 영문 대소문자, 숫자, 특수문자를 사용해야 합니다.")
     public String password;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

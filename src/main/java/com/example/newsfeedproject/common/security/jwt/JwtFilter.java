@@ -21,13 +21,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import java.io.IOException;
 import java.util.Collections;
 
-/**
- * 클라이언트가 요청 시 보내는 JWT를 검증하여 사용자를 인증하고,
- * 인증된 사용자의 정보를 SecurityContextHolder에 저장한다.
- * 사용 시기: 로그인 이후 인증이 필요한 API 요청 시 작동
- *
- * @author jiwon jung
- */
+// 클라이언트가 요청 시 보내는 JWT를 검증하여 사용자를 인증하고,
+// 인증된 사용자의 정보를 SecurityContextHolder에 저장한다.
+// 사용 시기: 로그인 이후 인증이 필요한 API 요청 시 작동
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -43,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-        String token = null;
+        String jwtToken = null;
 
         String authorizationHeader = request.getHeader("Authorization");
 
@@ -64,10 +60,10 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // 있으면 가져옴("Bearer " 떼고)
-        token = authorizationHeader.substring(7);
+        jwtToken = authorizationHeader.substring(7);
 
         try {
-            jwtUtil.validateToken(token);
+            jwtUtil.validateToken(jwtToken);
         } catch (CustomException e) {
             log.error("[{}] {}", ErrorCode.INVALID_TOKEN.name(), ErrorCode.INVALID_TOKEN.getMessage());
 
@@ -78,7 +74,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // 최종적으로 token 검증 완료 -> 일시적인 session 생성
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtUtil.extractEmail(jwtToken);
 
         UserDetails userDetails;
 

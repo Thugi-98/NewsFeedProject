@@ -7,11 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Spring Security에서 사용자의 정보를 담는 클래스
- *
- * @author jiwon jung
- */
+// Spring Security에서 사용자의 정보를 담는 클래스
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
