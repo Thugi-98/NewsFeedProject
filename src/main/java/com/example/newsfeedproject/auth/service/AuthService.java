@@ -25,9 +25,7 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
 
-    /**
-     * 회원가입을 합니다.
-     */
+    // 회원가입을 합니다.
     @Transactional
     public AuthSignupResponse signup(AuthSignupRequest request) {
 
