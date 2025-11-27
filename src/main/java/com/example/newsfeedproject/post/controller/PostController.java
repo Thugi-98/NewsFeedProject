@@ -63,25 +63,25 @@ public class PostController {
     }
 
     // 게시물 수정 기능
-    @PutMapping("/{postId}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PostUpdateResponse>> updatePostApi(
             @Valid @RequestBody PostUpdateRequest request,
-            @PathVariable Long postId,
+            @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(postService.update(request, postId, user)));
+                .body(ApiResponse.success(postService.update(request, id, user)));
     }
 
     // 게시물 삭제 기능
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePostApi(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long postId)
+            @PathVariable Long id)
     {
-        postService.delete(postId, user);
+        postService.delete(id, user);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

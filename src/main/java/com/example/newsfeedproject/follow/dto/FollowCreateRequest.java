@@ -3,7 +3,7 @@ package com.example.newsfeedproject.follow.dto;
 import lombok.Getter;
 
 @Getter
-public class CreateFollowRequest {
+public class FollowCreateRequest {
 
     private Long targetId;
 }

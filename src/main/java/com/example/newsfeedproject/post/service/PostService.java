@@ -9,6 +9,7 @@ import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.follow.repository.FollowRepository;
+import com.example.newsfeedproject.like.postLike.repository.PostLikeRepository;
 import com.example.newsfeedproject.post.dto.request.PostCreateRequest;
 import com.example.newsfeedproject.post.dto.request.PostUpdateRequest;
 import com.example.newsfeedproject.post.dto.response.PostCreateResponse;
@@ -35,6 +36,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
+    private final PostLikeRepository postLikeRepository;
 
     // 게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
@@ -76,8 +78,9 @@ public class PostService {
         }
 
         return posts.map(post -> {
-            long count = commentRepository.countByPostId(post.getId());
-            return PostGetAllResponse.from(post, count);
+            Long commentCount = commentRepository.countByPostId(post.getId());
+            Long postLikeCount = postLikeRepository.countByPostId(post.getId());
+            return PostGetAllResponse.from(post, postLikeCount, commentCount);
         });
     }
 
@@ -92,8 +95,9 @@ public class PostService {
         List<CommentResponse> commentResponses = comments.stream()
                 .map(CommentResponse::from)
                 .toList();
+        Long postLikeCount = postLikeRepository.countByPostId(post.getId());
 
-        return PostGetOneResponse.from(post, commentResponses);
+        return PostGetOneResponse.from(post, postLikeCount, commentResponses);
     }
 
     // 게시물 수정 기능

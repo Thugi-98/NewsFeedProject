@@ -17,13 +17,13 @@ public class Follow extends BaseEntity {
     private Long id;
 
     // 팔로우를 하는 유저
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "userId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private User user;
 
     // 팔로우를 당한 유저
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "targetId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "targetId")
     private User target;
 
     // 생성자

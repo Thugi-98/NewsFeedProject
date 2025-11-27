@@ -2,8 +2,8 @@ package com.example.newsfeedproject.like.commentLike.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
-import com.example.newsfeedproject.like.commentLike.dto.CreateCommentLikeResponse;
-import com.example.newsfeedproject.like.commentLike.dto.ReadCommentLikeResponse;
+import com.example.newsfeedproject.like.commentLike.dto.CommentLikeCreateResponse;
+import com.example.newsfeedproject.like.commentLike.dto.CommentLikeReadResponse;
 import com.example.newsfeedproject.like.commentLike.service.CommentLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,21 +20,25 @@ public class CommentLikeController {
 
     private final CommentLikeService commentLikeService;
 
-    /* 게시물에 좋아요 누르기 */
+    // 댓글에 좋아요 누르기
     @PostMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<CreateCommentLikeResponse>> likeApi(
+    public ResponseEntity<ApiResponse<CommentLikeCreateResponse>> likeApi(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(commentLikeService.create(user, commentId)));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(commentLikeService.create(user, commentId)));
     }
 
-    /* postId를 통해 좋아요 목록 확인하기*/
+    // commentId를 통해 좋아요 목록 확인하기
     @GetMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<List<ReadCommentLikeResponse>>> readLikeApi(
+    public ResponseEntity<ApiResponse<List<CommentLikeReadResponse>>> readLikeApi(
             @PathVariable Long commentId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(commentLikeService.read(commentId)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(commentLikeService.read(commentId)));
     }
 
     @DeleteMapping("/{commentId}")
@@ -43,6 +47,8 @@ public class CommentLikeController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         commentLikeService.delete(commentId, user);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }

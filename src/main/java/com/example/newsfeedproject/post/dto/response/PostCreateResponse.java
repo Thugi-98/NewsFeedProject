@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostCreateResponse {
     private final Long id;
-    private final String userName;
+    private final String postUserName;
     private final String title;
     private final String content;
     private final LocalDateTime createdAt;

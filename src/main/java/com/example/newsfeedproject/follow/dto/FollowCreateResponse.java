@@ -3,7 +3,7 @@ package com.example.newsfeedproject.follow.dto;
 import lombok.Getter;
 
 @Getter
-public class ReadFollowResponse {
+public class FollowCreateResponse {
 
     private final Long id;
     private final Long userId;
@@ -11,7 +11,7 @@ public class ReadFollowResponse {
     private final String targetName;
     private final String email;
 
-    public ReadFollowResponse(Long id, Long userId, Long targetId, String targetName, String email) {
+    public FollowCreateResponse(Long id, Long userId, Long targetId, String targetName, String email) {
         this.id = id;
         this.userId = userId;
         this.targetId = targetId;
