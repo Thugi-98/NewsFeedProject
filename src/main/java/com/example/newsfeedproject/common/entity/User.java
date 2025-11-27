@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -12,8 +14,11 @@ import java.time.LocalDate;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class User extends BaseEntity {
 
+    // 속성
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +27,11 @@ public class User extends BaseEntity {
     private String password;
     private LocalDate birth;
     private String introduction;
+    private boolean isDeleted = false;
+    private Boolean followPrivate = false;
 
-    public User(String name, String email, String password, LocalDate birth, String introduc) {
+    // 생성자
+    public User(String name, String email, String password, LocalDate birth, String introduction) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -31,14 +39,34 @@ public class User extends BaseEntity {
         this.introduction = introduction;
     }
 
-    public void update(UpdateUserRequest request) {
-        this.name = request.getName() != null ? request.getName() : this.name;
-        this.password = request.getPassword() != null ? request.getPassword() : this.password;
-        this.birth = request.getBirth() != null ? request.getBirth() : this.birth;
-        this.introduction = request.getIntroduction() != null ? request.getIntroduction() : this.introduction;
+    // 속성
+    public void update(UpdateUserRequest request, String newEncodedPassword) {
+        // 일반 정보 업데이트
+        if(request.getName() != null && !request.getName().trim().isEmpty()) {
+            this.name = request.getName().trim();
+        }
+        if(request.getBirth() != null) {
+            this.birth = request.getBirth();
+        }
+        if(request.getIntroduction() != null && !request.getIntroduction().trim().isEmpty()) {
+            this.introduction = request.getIntroduction().trim();
+        }
+        if(request.getFollowPrivate() != null) {
+            this.followPrivate = request.getFollowPrivate();
+        }
+
+        // 비밀번호 수정값이 있는 경우에만 비밀번호를 업데이트
+        if (newEncodedPassword != null && !newEncodedPassword.isEmpty()) {
+            this.password = newEncodedPassword;
+        }
     }
 
-    public void updatePassword(String encodedPassword) {
-        this.password = encodedPassword;
+    public void softDelete() {
+        this.isDeleted = true;
     }
+
+    // 이미 삭제된 유저인지 확인하는 메서드 추가 (예외 처리를 위해 사용)
+//    public boolean isDeleted() {
+//        return this.isDeleted;
+//    }
 }
