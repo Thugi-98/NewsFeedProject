@@ -32,11 +32,17 @@ public class FollowService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
+        if (user.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 2. 팔로우 하는 유저가 존재하는지 확인 - target이 존재하는 유저인지 확인 */
         User target = userRepository.findById(targetId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
+        if (target.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_USER));
+        }
 
         /* 3. 예외가 발생되는 경우인지 확인을 위해 follow 전체 목록 불러오기 */
         List<Follow> follows = followRepository.findAll();
@@ -68,6 +74,9 @@ public class FollowService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
+        if (user.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 2. 전체 팔로우 목록 불러오기 */
         List<Follow> follows = followRepository.findAll();
@@ -90,6 +99,9 @@ public class FollowService {
         User target = userRepository.findById(targetId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
+        if (target.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_USER));
+        }
 
         /* 3-2-2. target 비공개 여부 확인 */
         if (target.getFollowPrivate().equals(true)) {
@@ -114,11 +126,17 @@ public class FollowService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
+        if (user.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 2. target 유저가 존재하는지 확인 */
         User target = userRepository.findById(targetId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
+        if (target.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 3. 조건에 해당하는 Follow 찾기 */
         Follow follow = followRepository.findByUserIdAndTargetId(user.getId(), target.getId()).orElseThrow(

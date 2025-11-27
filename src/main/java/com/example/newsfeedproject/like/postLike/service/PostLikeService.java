@@ -33,11 +33,17 @@ public class PostLikeService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
+        if (user.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 2. 좋아요가 달릴 게시물 확인 */
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         /* 3. 예외가 발생되는 경우인지 확인하기 위해 전체 postLike 목록 불러오기 */
         List<PostLike> postLikes = postLikeRepository.findAll();
@@ -64,6 +70,9 @@ public class PostLikeService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         /* 2. 해당 Post의 좋아요 전부 출력하기 */
         List<PostLike> postLikes = postLikeRepository.findAll();
@@ -87,11 +96,17 @@ public class PostLikeService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
+        if (user.isDeleted()) {
+            throw new CustomException((ErrorCode.ACCESS_DENIED));
+        }
 
         /* 2. 좋아요를 취소할 게시물 확인 */
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         /* 3. 조건에 해당하는 PostLike 찾기 */
         PostLike postLike = postLikeRepository.findByPostIdAndUserId(post.getId(), user.getId()).orElseThrow(
