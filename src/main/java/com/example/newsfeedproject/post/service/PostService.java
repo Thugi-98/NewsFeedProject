@@ -36,7 +36,7 @@ public class PostService {
 
     //게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+        User user = userRepository.findByEmail(userDetails.getUserEmail()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
@@ -97,9 +97,9 @@ public class PostService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
-        //본인 말고 다른 유저의 게시물은 수정 불가
+        //본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -116,7 +116,7 @@ public class PostService {
 
         //본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         post.softDelete();
