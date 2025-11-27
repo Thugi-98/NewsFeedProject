@@ -96,7 +96,7 @@ public class PostService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
-        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalse(post.getId());
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalseOrderByCreatedAtAsc(post.getId());
 
         List<CommentResponse> commentResponses = comments.stream()
                 .map(CommentResponse::from)

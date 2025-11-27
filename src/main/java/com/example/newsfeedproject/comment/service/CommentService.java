@@ -1,7 +1,7 @@
 package com.example.newsfeedproject.comment.service;
 
-import com.example.newsfeedproject.comment.dto.response.CommentResponse;
 import com.example.newsfeedproject.comment.dto.request.CreateCommentRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentResponse;
 import com.example.newsfeedproject.comment.dto.request.UpdateCommentRequest;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.entity.Comment;
@@ -32,13 +32,13 @@ public class CommentService {
 
     // 댓글 생성
     @Transactional
-    public CommentResponse createComment(CreateCommentRequest request, CustomUserDetails userDetails) {
+    public CommentResponse createComment(Long postId, CustomUserDetails userDetails,  CreateCommentRequest request) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_USER)
                 );
 
-        Post post = postRepository.findById(request.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
@@ -55,7 +55,7 @@ public class CommentService {
 
         postRepository.findById(postId);
 
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalseOrderByCreatedAtAsc(postId);
 
         return comments.stream()
                 .map(CommentResponse::from)
@@ -91,6 +91,6 @@ public class CommentService {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        commentRepository.delete(comment);
+        comment.softDelete();
     }
 }
