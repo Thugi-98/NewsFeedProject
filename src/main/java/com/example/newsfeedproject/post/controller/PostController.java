@@ -20,14 +20,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
 
-     //게시물 생성 기능
-    @PostMapping("/posts")
+     // 게시물 생성 기능
+    @PostMapping
     public ResponseEntity<ApiResponse<PostCreateResponse>> createPostApi(
             @Valid @RequestBody PostCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails user
@@ -37,8 +38,8 @@ public class PostController {
                 .body(ApiResponse.success(postService.save(request, user)));
     }
 
-    //게시물 전체조회 기능
-    @GetMapping("/posts")
+    // 게시물 전체조회 기능
+    @GetMapping
     public ResponseEntity<ApiResponse<Page<PostGetAllResponse>>> getAllPostApi(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) Long userId,
@@ -49,8 +50,8 @@ public class PostController {
                 .body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
     }
 
-    //게시물 단건 조회 기능
-    @GetMapping("/posts/{id}")
+    // 게시물 단건 조회 기능
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostGetOneResponse>> getOnePostApi(
             @PathVariable Long id
     ) {
@@ -59,8 +60,8 @@ public class PostController {
                 .body(ApiResponse.success(postService.getPost(id)));
     }
 
-    //게시물 수정 기능
-    @PutMapping("/posts/{postId}")
+    // 게시물 수정 기능
+    @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostUpdateResponse>> updatePostApi(
             @Valid @RequestBody PostUpdateRequest request,
             @PathVariable Long postId,
@@ -72,8 +73,8 @@ public class PostController {
                 .body(ApiResponse.success(postService.update(request, postId, user)));
     }
 
-    //게시물 삭제 기능
-    @DeleteMapping("/posts/{postId}")
+    // 게시물 삭제 기능
+    @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> deletePostApi(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long postId)
