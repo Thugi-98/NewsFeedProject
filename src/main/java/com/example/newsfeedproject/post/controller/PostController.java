@@ -50,9 +50,11 @@ public class PostController {
     public ResponseEntity<ApiResponse<Page<GetPostsResponse>>> getPostsApi(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false, defaultValue = "false") boolean all) {
-
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(required = false, defaultValue = "false") boolean all,
+            @RequestParam(required = false, defaultValue = "false") boolean onlyFollow
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, user.getUsername(), all, onlyFollow)));
     }
 
     /**

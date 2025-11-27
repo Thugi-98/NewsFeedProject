@@ -8,6 +8,7 @@ import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.follow.repository.FollowRepository;
 import com.example.newsfeedproject.post.dto.request.CreatePostRequest;
 import com.example.newsfeedproject.post.dto.request.UpdatePostRequest;
 import com.example.newsfeedproject.post.dto.response.CreatePostResponse;
@@ -33,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
 
     /**
      * 게시물 생성 기능
@@ -59,7 +61,7 @@ public class PostService {
      * @return
      */
     @Transactional(readOnly = true)
-    public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, boolean all) {
+    public Page<GetPostsResponse> getPosts(Pageable pageable, Long userId, String email, boolean all, boolean onlyFollow) {
 
         PageRequest request;
         if (all) {
@@ -75,6 +77,11 @@ public class PostService {
         Page<Post> posts;
         if (userId != null) {
             posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
+        } else if (onlyFollow) {
+            Long loginnedId = userRepository.findByEmail(email).get().getId();
+            List<Long> followingId = followRepository.findTargetIdByUserId(loginnedId);
+
+            posts = postRepository.findByUserIdInAndIsDeletedFalse(followingId, request);
         } else {
             posts = postRepository.findByIsDeletedFalse(request);
         }
