@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FollowService {
 
@@ -25,7 +26,6 @@ public class FollowService {
     private final UserRepository userRepository;
 
     // CREATE - 다른 유저 팔로우하기
-    @Transactional
     public @Nullable FollowCreateResponse create(CustomUserDetails userDetails, Long targetId) {
 
         // 1. 접근 유저가 누구인지 확인
@@ -65,8 +65,8 @@ public class FollowService {
     }
 
     // READ - 특정 유저가 팔로우하는 유저 목록 확인하기
-    @Transactional
-    public @Nullable List<FollowGetAllByUserResponse> read(CustomUserDetails userDetails, Long targetId) {
+    @Transactional(readOnly = true)
+    public List<FollowGetAllByUserResponse> read(CustomUserDetails userDetails, Long targetId) {
 
         // 1. 접근 유저가 누구인지 확인
         User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
@@ -115,7 +115,6 @@ public class FollowService {
     }
 
     // DELETE - 특정 ROW 삭제
-    @Transactional
     public void delete(CustomUserDetails userDetails, Long targetId) {
 
         // 1. 접근 유저가 누구인지 확인
