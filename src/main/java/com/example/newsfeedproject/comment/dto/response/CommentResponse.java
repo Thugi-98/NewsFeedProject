@@ -16,7 +16,7 @@ public class CommentResponse {
 
     private Long id;
     private Long postId;
-    private Long userId;
+    private String userName;
     private String comment;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
@@ -25,7 +25,7 @@ public class CommentResponse {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
-                .userId(comment.getUser().getId())
+                .userName(comment.getUser().getName())
                 .comment(comment.getComment())
                 .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
