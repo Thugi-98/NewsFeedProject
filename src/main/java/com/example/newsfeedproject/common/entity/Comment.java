@@ -33,6 +33,8 @@ public class Comment extends BaseEntity{
     @Column(nullable = false,  length = 100)
     private String comment;
 
+    private boolean isDelete = false;
+
     // 생성자
     @Builder
     public Comment(Post post, User user, String comment) {
