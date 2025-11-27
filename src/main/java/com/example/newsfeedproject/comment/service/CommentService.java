@@ -42,6 +42,9 @@ public class CommentService {
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
+        if (post.isDeleted() == true) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
