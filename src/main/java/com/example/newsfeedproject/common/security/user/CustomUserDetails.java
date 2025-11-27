@@ -4,7 +4,6 @@ import com.example.newsfeedproject.common.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,6 +20,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // 인가는 구현 x
+    }
+
+    public String getUserEmail() {
+        return user.getEmail();
     }
 
     @Override

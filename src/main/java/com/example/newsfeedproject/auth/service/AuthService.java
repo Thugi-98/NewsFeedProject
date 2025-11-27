@@ -64,9 +64,8 @@ public class AuthService {
     public TokenResponse login(LoginUserRequest request) {
 
         // 요청 이메일로 가입된 유저가 있는지 확인
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new CustomException(ErrorCode.LOGIN_FAIL)
-        );
+        User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail())
+            .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAIL));
 
         // 비밀번호가 일치하는지 확인
         if (!bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword())) {
