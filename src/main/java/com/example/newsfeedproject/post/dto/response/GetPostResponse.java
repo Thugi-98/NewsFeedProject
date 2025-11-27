@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.post.dto.response;
 
-import com.example.newsfeedproject.comment.dto.response.CommentResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
 import com.example.newsfeedproject.common.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,11 +15,11 @@ public class GetPostResponse {
     private final String userName;
     private final String title;
     private final String content;
-    private final List<CommentResponse> comments;
+    private final List<CommentGetResponse> comments;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public static GetPostResponse from(Post post, List<CommentResponse> comments) {
+    public static GetPostResponse from(Post post, List<CommentGetResponse> comments) {
 
         return new GetPostResponse(
                 post.getId(),

@@ -31,6 +31,7 @@ public class Comment extends BaseEntity{
     @Column(nullable = false,  length = 100)
     private String comment;
 
+    // 삭제 여부 플래그
     private boolean isDeleted = false;
 
     // 생성자
@@ -46,6 +47,7 @@ public class Comment extends BaseEntity{
             this.comment = comment;
     }
 
+    // 댓글 삭제 메서드
     public void softDelete() {
         this.isDeleted = true;
     }

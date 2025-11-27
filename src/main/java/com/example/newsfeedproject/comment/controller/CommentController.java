@@ -1,14 +1,14 @@
 package com.example.newsfeedproject.comment.controller;
 
-import com.example.newsfeedproject.comment.dto.response.CommentResponse;
-import com.example.newsfeedproject.comment.dto.request.CreateCommentRequest;
-import com.example.newsfeedproject.comment.dto.request.UpdateCommentRequest;
+import com.example.newsfeedproject.comment.dto.request.CommentCreateRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentCreateResponse;
+import com.example.newsfeedproject.comment.dto.request.CommentUpdateRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
 import com.example.newsfeedproject.comment.service.CommentService;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
+/**
+ * 댓글 관련 REST API 요청을 처리하는 컨트롤러
+ * 댓글 생성, 조회, 수정, 삭제 기능 제공
+ */
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor
@@ -24,38 +27,50 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    // 댓글 생성 API
     @PostMapping
-    public ResponseEntity<ApiResponse<CommentResponse>> createCommentApi(@RequestParam Long postId, @AuthenticationPrincipal CustomUserDetails user, @Valid @RequestBody CreateCommentRequest request) {
+    public ResponseEntity<ApiResponse<CommentCreateResponse>> createCommentApi(
+            @RequestParam Long postId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody CommentCreateRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(commentService.createComment(postId,user,request)));
+                .body(ApiResponse.success(commentService.createComment(postId, user, request)));
     }
 
+    // 툭정 게시글의 댓글 전체 조회 API
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> readCommentApi(@RequestParam Long postId) {
+    public ResponseEntity<ApiResponse<List<CommentGetResponse>>> getAllCommentApi(
+            @RequestParam Long postId) {
 
-        List<CommentResponse> comments = commentService.readComment(postId);
+        List<CommentGetResponse> comments = commentService.getComment(postId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(comments));
     }
 
+    // 댓글 수정 API
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CommentResponse>> updateCommentApi(@PathVariable Long id, @Valid @RequestBody UpdateCommentRequest request, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<ApiResponse<CommentCreateResponse>> updateCommentApi(
+            @PathVariable Long id,
+            @Valid @RequestBody CommentUpdateRequest request,
+            @AuthenticationPrincipal CustomUserDetails user) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(commentService.updateComment(id,request, user)));
+                .body(ApiResponse.success(commentService.updateComment(id, request, user)));
     }
 
+    // 댓글 삭제 API
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCommentApi(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<ApiResponse<Void>> deleteCommentApi(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+
         commentService.deleteComment(id, user);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.success(null));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

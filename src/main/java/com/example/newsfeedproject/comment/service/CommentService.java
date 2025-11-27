@@ -1,8 +1,9 @@
 package com.example.newsfeedproject.comment.service;
 
-import com.example.newsfeedproject.comment.dto.request.CreateCommentRequest;
-import com.example.newsfeedproject.comment.dto.response.CommentResponse;
-import com.example.newsfeedproject.comment.dto.request.UpdateCommentRequest;
+import com.example.newsfeedproject.comment.dto.request.CommentCreateRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentCreateResponse;
+import com.example.newsfeedproject.comment.dto.request.CommentUpdateRequest;
+import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.entity.Post;
@@ -13,14 +14,15 @@ import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
+/**
+ * 댓글 서비스 클래스
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,75 +33,83 @@ public class CommentService {
     private final UserRepository userRepository;
 
     // 댓글 생성
-    @Transactional
-    public CommentResponse createComment(Long postId, CustomUserDetails userDetails,  CreateCommentRequest request) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_USER)
-                );
+    public CommentCreateResponse createComment(Long postId, CustomUserDetails userDetails, CommentCreateRequest request) {
 
-        Post post = postRepository.findById(postId)
+        // 사용자 조회
+        User findUser = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
-        if (post.isDeleted()) {
+                        () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        // 게시글 조회 및 삭제 여부 확인
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(
+                        () -> new CustomException(ErrorCode.NOT_FOUND_POST));
+        if (findPost.isDeleted()) {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
 
-        Comment comment = request.toEntity(user, post);
-        Comment savedComment = commentRepository.save(comment);
+        // 댓글 엔티티 생성 및 저장
+        Comment newComment = request.toEntity(findUser, findPost);
+        Comment savedComment = commentRepository.save(newComment);
 
-        return CommentResponse.from(savedComment);
+        return CommentCreateResponse.from(savedComment);
     }
 
-    // 댓글 조회
+    // 특정 게시글의 댓글 전체 조회
     @Transactional(readOnly = true)
-    public List<CommentResponse> readComment(Long postId) {
+    public List<CommentGetResponse> getComment(Long postId) {
 
-        Post post = postRepository.findById(postId)
+        // 게시글 조회 및 삭제 여부 확인
+        Post findPost = postRepository.findById(postId)
                 .orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
-        );
-        if (post.isDeleted()) {
+                () -> new CustomException(ErrorCode.NOT_FOUND_POST));
+        if (findPost.isDeleted()) {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
 
+        // 삭제되지 않은 댓글 전제 조회
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 
         return comments.stream()
-                .map(CommentResponse::from)
+                .map(CommentGetResponse::from)
                 .collect(Collectors.toList());
     }
 
     // 댓글 수정
-    @Transactional
-    public CommentResponse updateComment(Long id, UpdateCommentRequest request, CustomUserDetails userDetails) {
+    public CommentCreateResponse updateComment(Long id, CommentUpdateRequest request, CustomUserDetails userDetails) {
 
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+        // 댓글 조회
+        Comment findComment = commentRepository.findById(id)
+                .orElseThrow(
+                        () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
-        User user = comment.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        // 작성자 권한 확인
+        User user = findComment.getUser();
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        comment.update(request.getComment());
+        // 댓글 내용 수정
+        findComment.update(request.getComment());
 
-        return CommentResponse.from(comment);
+        return CommentCreateResponse.from(findComment);
     }
 
-    // 댓글 삭제
-    @Transactional
+    // 댓글 삭제 (소프트 딜리트)
     public void deleteComment(Long id, CustomUserDetails userDetails) {
 
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+        // 댓글 조회
+        Comment findComment = commentRepository.findById(id)
+                .orElseThrow(
+                        () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
-        User user = comment.getUser();
-        if (!user.getEmail().equals(userDetails.getUsername())) {
+        // 작성자 권한 확인
+        User user = findComment.getUser();
+        if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        comment.softDelete();
+        // 소프트 딜리트 처리
+        findComment.softDelete();
     }
 }
