@@ -32,8 +32,7 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(
-                        userService.getOne(id)));
+                .body(ApiResponse.success(userService.getOne(id)));
 
     }
 
