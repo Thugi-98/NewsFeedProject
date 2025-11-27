@@ -33,12 +33,10 @@ public class CommentService {
     public CommentCreateResponse createComment(Long postId, CustomUserDetails userDetails, CommentCreateRequest request) {
 
         User findUser = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
         if (findPost.isDeleted()) {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
@@ -54,8 +52,7 @@ public class CommentService {
     public List<CommentGetResponse> getComment(Long postId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
         if (findPost.isDeleted()) {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
@@ -71,8 +68,7 @@ public class CommentService {
     public CommentCreateResponse updateComment(Long id, CommentUpdateRequest request, CustomUserDetails userDetails) {
 
         Comment findComment = commentRepository.findById(id)
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
         User user = findComment.getUser();
         if (!user.getEmail().equals(userDetails.getUserEmail())) {
@@ -88,8 +84,7 @@ public class CommentService {
     public void deleteComment(Long id, CustomUserDetails userDetails) {
 
         Comment findComment = commentRepository.findById(id)
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
 
         User user = findComment.getUser();
         if (!user.getEmail().equals(userDetails.getUserEmail())) {
