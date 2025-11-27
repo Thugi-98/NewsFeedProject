@@ -22,6 +22,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Spring Security 설정 클래스
+ * Spring Security는 스프링 기반 애플리케이션의 보안(인증, 권한)을 담당하는 프레임워크
+ * Spring Security는 필터 기반으로 동작하기 때문에 스프링 MVC와 분리되어 동작한다.
  */
 @Configuration
 @EnableWebSecurity
@@ -41,7 +43,6 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
-
     }
 
     /**
@@ -75,16 +76,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) {
 
-        // 로그인 필터 (JWT 발급 담당)
-        // 로그인 시도를 가로채서 인증하고, 성공 시 JWT 발급하도록 하는 커스텀 필터
-        LoginFilter loginFilter = new LoginFilter(authenticationManager, jwtUtil, objectMapper(), handlerExceptionResolver);
-        loginFilter.setFilterProcessesUrl("/login"); // 해당 필터가 /login 요청을 처리하도록 지정
-
         // JWT 인증 필터 (로그인 이후 매 요청마다 JWT 검증)
         JwtFilter jwtFilter = new JwtFilter(jwtUtil, userDetailsService, handlerExceptionResolver);
 
         http
-                .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 보호 비활성화
+                .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 보호 비활성화 (사용자가 의도하지 않은 작업을 특정 웹사이트에서 수행하도록 유도하는 공격 기법)
                 .formLogin(form -> form.disable()) // 기본 로그인 폼 비활성화 (JWT 사용)
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
 
@@ -92,10 +88,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/signup", "/login").permitAll() // 로그인, 회원가입은 누구나 요청 허용
                         .anyRequest().authenticated()) // 그 외의 요청은 인증된 사용자만 접근 가능
-
-                // LoginFilter가 UserNamePasswordAuthenticationFilter를 대체
-                // UsernamePasswordAuthenticationFilter -> 사용자의 아이디(username)와 비밀번호(password)를 받아 인증을 처리하는 필터
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // JWT 필터 추가 (기존 UsernamePasswordAuthenticationFilter 이전에 실행)
                 // UsernamePasswordAuthenticationFilter -> 사용자의 아이디(username)와 비밀번호(password)를 받아 인증을 처리하는 필터
@@ -111,9 +103,6 @@ public class SecurityConfig {
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK); // 로그아웃 성공 처리
                         }));
-
-                // 인증 실패 시 동작하는 엔트리 포인트 지정
-//                .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         return http.build(); // 체인 빌드
     }

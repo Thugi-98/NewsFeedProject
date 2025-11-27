@@ -1,4 +1,4 @@
-package com.example.newsfeedproject.user.dto.response;
+package com.example.newsfeedproject.auth.dto.response;
 
 import com.example.newsfeedproject.common.entity.User;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @RequiredArgsConstructor
-public class CreateUserResponse {
+public class SignupUserResponse {
 
     private final Long id;
     private final String name;
@@ -25,9 +25,9 @@ public class CreateUserResponse {
     private final LocalDateTime modifiedAt;
 
     // 정적 팩토리 메소드
-    public static CreateUserResponse from(User user) {
+    public static SignupUserResponse from(User user) {
 
-        return new CreateUserResponse(
+        return new SignupUserResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
