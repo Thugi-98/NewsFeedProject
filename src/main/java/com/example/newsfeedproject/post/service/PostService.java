@@ -34,7 +34,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
-    //게시물 생성 기능
+    // 게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUserEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -45,11 +45,11 @@ public class PostService {
         return PostCreateResponse.from(savedPost);
     }
 
-    //게시물 전체 조회 기능
+    // 게시물 전체 조회 기능
     @Transactional(readOnly = true)
     public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, boolean all) {
 
-        //페이징 없이 모든 게시물을 보기위한 조회
+        // 페이징 없이 모든 게시물을 보기위한 조회
         PageRequest request;
         if (all) {
             request = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -60,7 +60,7 @@ public class PostService {
             );
         }
 
-        //페이징 조회 시 유저 아이디의 관련된 게시물만 조회 외에는 모든 게시물을 페이징 조회
+        // 페이징 조회 시 유저 아이디의 관련된 게시물만 조회 외에는 모든 게시물을 페이징 조회
         Page<Post> posts;
         if (userId != null) {
             posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
@@ -74,7 +74,7 @@ public class PostService {
         });
     }
 
-    //게시물 단건 조회 기능
+    // 게시물 단건 조회 기능
     @Transactional(readOnly = true)
     public PostGetOneResponse getPost(Long id) {
         Post post = postRepository.findByIdAndIsDeletedFalse(id)
@@ -89,12 +89,12 @@ public class PostService {
         return PostGetOneResponse.from(post, commentResponses);
     }
 
-    //게시물 수정 기능
+    // 게시물 수정 기능
     public PostUpdateResponse update(PostUpdateRequest request, Long postId, CustomUserDetails userDetails) {
         Post post = postRepository.findByIdAndIsDeletedFalse(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
-        //본인 말고 다른 유저의 게시물은 삭제 불가
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
         if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
@@ -106,12 +106,12 @@ public class PostService {
         return PostUpdateResponse.from(post);
     }
 
-    //게시물 삭제 기능
+    // 게시물 삭제 기능
     public void delete(Long postId, CustomUserDetails userDetails) {
         Post post = postRepository.findByIdAndIsDeletedFalse(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
-        //본인 말고 다른 유저의 게시물은 삭제 불가
+        // 본인 말고 다른 유저의 게시물은 삭제 불가
         User user = post.getUser();
         if (!user.getEmail().equals(userDetails.getUserEmail())) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
