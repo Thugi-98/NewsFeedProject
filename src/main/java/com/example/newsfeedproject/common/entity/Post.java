@@ -29,7 +29,7 @@ public class Post extends BaseEntity {
         this.user = user;
     }
 
-    //업데이트 기능
+    // 업데이트 기능
     public void update(String title, String content) {
         if (title != null && !title.trim().isEmpty()) {
             this.title = title.trim();
@@ -39,7 +39,7 @@ public class Post extends BaseEntity {
         }
     }
 
-    //소프트 딜리트 삭제 기능
+    // 소프트 딜리트 삭제 기능
     public void softDelete() {
         this.isDeleted = true;
     }
