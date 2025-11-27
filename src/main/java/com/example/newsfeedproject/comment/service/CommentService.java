@@ -42,7 +42,7 @@ public class CommentService {
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
-        if (post.isDeleted() == true) {
+        if (post.isDeleted()) {
             throw new CustomException((ErrorCode.NOT_FOUND_POST));
         }
 
@@ -56,7 +56,13 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> readComment(Long postId) {
 
-        postRepository.findById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+        );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 
