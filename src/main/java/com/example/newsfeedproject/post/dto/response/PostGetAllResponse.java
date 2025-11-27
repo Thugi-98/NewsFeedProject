@@ -11,18 +11,20 @@ import java.time.LocalDateTime;
 public class PostGetAllResponse {
 
     private final Long id;
-    private final String userName;
+    private final String postUserName;
     private final String title;
-    private final int commentCount;
+    private final Long postLikeCount;
+    private final Long commentCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public static PostGetAllResponse from(Post post, long commentCount) {
+    public static PostGetAllResponse from(Post post, Long postLikeCount, Long commentCount) {
         return new PostGetAllResponse(
                 post.getId(),
                 post.getUser().getName(),
                 post.getTitle(),
-                (int) commentCount,
+                postLikeCount,
+                commentCount,
                 post.getCreatedAt(),
                 post.getModifiedAt()
         );

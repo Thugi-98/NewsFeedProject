@@ -8,6 +8,9 @@ import com.example.newsfeedproject.common.entity.Post;
 import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.follow.repository.FollowRepository;
+import com.example.newsfeedproject.like.commentLike.repository.CommentLikeRepository;
+import com.example.newsfeedproject.like.postLike.repository.PostLikeRepository;
 import com.example.newsfeedproject.post.dto.request.PostCreateRequest;
 import com.example.newsfeedproject.post.dto.request.PostUpdateRequest;
 import com.example.newsfeedproject.post.dto.response.PostCreateResponse;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
@@ -47,7 +54,7 @@ public class PostService {
 
     // 게시물 전체 조회 기능
     @Transactional(readOnly = true)
-    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, boolean all) {
+    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, String email, boolean all, boolean onlyFollow) {
 
         // 페이징 없이 모든 게시물을 보기위한 조회
         PageRequest request;
@@ -64,13 +71,19 @@ public class PostService {
         Page<Post> posts;
         if (userId != null) {
             posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
+        } else if (onlyFollow) {
+            Long loginnedId = userRepository.findByEmail(email).get().getId();
+            List<Long> followingId = followRepository.findTargetIdByUserId(loginnedId);
+
+            posts = postRepository.findByUserIdInAndIsDeletedFalse(followingId, request);
         } else {
             posts = postRepository.findByIsDeletedFalse(request);
         }
 
         return posts.map(post -> {
-            long count = commentRepository.countByPostId(post.getId());
-            return PostGetAllResponse.from(post, count);
+            Long commentCount = commentRepository.countByPostId(post.getId());
+            Long postLikeCount = postLikeRepository.countByPostId(post.getId());
+            return PostGetAllResponse.from(post, postLikeCount, commentCount);
         });
     }
 
@@ -83,10 +96,14 @@ public class PostService {
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
         List<CommentGetAllResponse> commentGetAllResponse = comments.stream()
-                .map(CommentGetAllResponse::from)
-                .toList();
+                .map(comment -> {
+                    Long commentLikeCount = commentLikeRepository.countByCommentId(comment.getId());
+                    return CommentGetAllResponse.from(comment, commentLikeCount);
+                })
+                .collect(Collectors.toList());
+        Long postLikeCount = postLikeRepository.countByPostId(post.getId());
 
-        return PostGetOneResponse.from(post, commentGetAllResponse);
+        return PostGetOneResponse.from(post, postLikeCount, commentGetAllResponse);
     }
 
     // 게시물 수정 기능

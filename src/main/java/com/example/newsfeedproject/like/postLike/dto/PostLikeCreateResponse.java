@@ -3,15 +3,15 @@ package com.example.newsfeedproject.like.postLike.dto;
 import lombok.Getter;
 
 @Getter
-public class ReadPostLikeResponse {
+public class PostLikeCreateResponse {
 
     private final Long id;
     private final Long postId;
-    private final Long userId;
+    private final Long postLikeUserId;
 
-    public ReadPostLikeResponse(Long id, Long postId, Long userId) {
+    public PostLikeCreateResponse(Long id, Long postId, Long postLikeUserId) {
         this.id = id;
         this.postId = postId;
-        this.userId = userId;
+        this.postLikeUserId = postLikeUserId;
     }
 }

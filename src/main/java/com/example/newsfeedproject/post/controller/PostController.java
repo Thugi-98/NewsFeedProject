@@ -43,11 +43,13 @@ public class PostController {
     public ResponseEntity<ApiResponse<Page<PostGetAllResponse>>> getAllPostApi(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false, defaultValue = "false") boolean all
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(required = false, defaultValue = "false") boolean all,
+            @RequestParam(required = false, defaultValue = "false") boolean onlyFollow
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(postService.getPosts(pageable, userId, all)));
+                .body(ApiResponse.success(postService.getPosts(pageable, userId, user.getUserEmail(), all, onlyFollow)));
     }
 
     // 게시물 단건 조회 기능
@@ -61,25 +63,25 @@ public class PostController {
     }
 
     // 게시물 수정 기능
-    @PutMapping("/{postId}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PostUpdateResponse>> updatePostApi(
             @Valid @RequestBody PostUpdateRequest request,
-            @PathVariable Long postId,
+            @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(postService.update(request, postId, user)));
+                .body(ApiResponse.success(postService.update(request, id, user)));
     }
 
     // 게시물 삭제 기능
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePostApi(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long postId)
+            @PathVariable Long id)
     {
-        postService.delete(postId, user);
+        postService.delete(id, user);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
