@@ -58,7 +58,7 @@ public class CommentService {
 
         postRepository.findById(postId);
 
-        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalseOrderByCreatedAtAsc(postId);
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 
         return comments.stream()
                 .map(CommentResponse::from)

@@ -74,9 +74,9 @@ public class PostService {
 
         Page<Post> posts;
         if (userId != null) {
-            posts = postRepository.findByUserIdAndIsDeleteFalse(userId, request);
+            posts = postRepository.findByUserIdAndIsDeletedFalse(userId, request);
         } else {
-            posts = postRepository.findByIsDeleteFalse(request);
+            posts = postRepository.findByIsDeletedFalse(request);
         }
 
         return posts.map(post -> {
@@ -92,11 +92,11 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public GetPostResponse getPost(Long id) {
-        Post post = postRepository.findByIdAndIsDeleteFalse(id).orElseThrow(
+        Post post = postRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
-        List<Comment> comments = commentRepository.findByPostIdAndIsDeleteFalseOrderByCreatedAtAsc(post.getId());
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
         List<CommentResponse> commentResponses = comments.stream()
                 .map(CommentResponse::from)
@@ -113,7 +113,7 @@ public class PostService {
      * @return
      */
     public UpdatePostResponse update(UpdatePostRequest request, Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
@@ -133,7 +133,7 @@ public class PostService {
      * @param userDetails
      */
     public void delete(Long postId, CustomUserDetails userDetails) {
-        Post post = postRepository.findByIdAndIsDeleteFalse(postId).orElseThrow(
+        Post post = postRepository.findByIdAndIsDeletedFalse(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
 
