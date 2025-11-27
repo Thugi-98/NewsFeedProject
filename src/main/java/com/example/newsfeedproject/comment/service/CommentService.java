@@ -12,6 +12,7 @@ import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
+import com.example.newsfeedproject.like.commentLike.repository.CommentLikeRepository;
 import com.example.newsfeedproject.post.repository.PostRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 댓글 생성
     public CommentCreateResponse createComment(Long postId, CustomUserDetails userDetails, CommentCreateRequest request) {
@@ -61,7 +63,10 @@ public class CommentService {
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 
         return comments.stream()
-                .map(CommentGetAllResponse::from)
+                .map(comment -> {
+                    Long commentLikeCount = commentLikeRepository.countByCommentId(comment.getId());
+                    return CommentGetAllResponse.from(comment, commentLikeCount);
+                })
                 .collect(Collectors.toList());
     }
 

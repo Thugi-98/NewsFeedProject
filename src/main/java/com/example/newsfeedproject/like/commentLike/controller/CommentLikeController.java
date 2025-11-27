@@ -41,6 +41,7 @@ public class CommentLikeController {
                 .body(ApiResponse.success(commentLikeService.read(commentId)));
     }
 
+    // 댓글에 좋아요 취소하기
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> unlikeApi(
             @PathVariable Long commentId,

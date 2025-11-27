@@ -32,9 +32,6 @@ public class CommentLikeService {
         // 1. 접근 유저가 누구인지 확인
         User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
-        if (user.isDeleted()) {
-            throw new CustomException((ErrorCode.ACCESS_DENIED));
-        }
 
         // 2. 좋아요가 달릴 댓글 확인
         Comment comment = commentRepository.findById(commentId)
@@ -92,9 +89,6 @@ public class CommentLikeService {
         // 1. 접근 유저가 누구인지 확인
         User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
-        if (user.isDeleted()) {
-            throw new CustomException((ErrorCode.ACCESS_DENIED));
-        }
 
         // 2. 좋아요를 취소할 댓글 확인
         Comment comment = commentRepository.findById(commentId)

@@ -2,7 +2,6 @@ package com.example.newsfeedproject.comment.dto.response;
 
 import com.example.newsfeedproject.common.entity.Comment;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -11,12 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentCreateResponse {
 
-    private Long id;
-    private Long postId;
-    private String commentUserName;
-    private String comment;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private final Long id;
+    private final Long postId;
+    private final String commentUserName;
+    private final String comment;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime modifiedAt;
 
     public static CommentCreateResponse from(Comment comment) {
         return new CommentCreateResponse(

@@ -14,4 +14,7 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
             @Param("commentId") Long commentId,
             @Param("userId") Long userId
     );
+
+    @Query("SELECT COUNT(p) FROM CommentLike p WHERE p.comment.id = :commentId")
+    Long countByCommentId(@Param("commentId") Long commentId);
 }

@@ -7,11 +7,11 @@ public class CommentLikeCreateResponse {
 
     private final Long id;
     private final Long commentId;
-    private final Long userId;
+    private final Long commentLikeUserId;
 
-    public CommentLikeCreateResponse(Long id, Long commentId, Long userId) {
+    public CommentLikeCreateResponse(Long id, Long commentId, Long commentLikeUserId) {
         this.id = id;
         this.commentId = commentId;
-        this.userId = userId;
+        this.commentLikeUserId = commentLikeUserId;
     }
 }

@@ -9,6 +9,7 @@ import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.follow.repository.FollowRepository;
+import com.example.newsfeedproject.like.commentLike.repository.CommentLikeRepository;
 import com.example.newsfeedproject.like.postLike.repository.PostLikeRepository;
 import com.example.newsfeedproject.post.dto.request.PostCreateRequest;
 import com.example.newsfeedproject.post.dto.request.PostUpdateRequest;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 게시물 생성 기능
     public PostCreateResponse save(PostCreateRequest request, CustomUserDetails userDetails) {
@@ -93,8 +96,11 @@ public class PostService {
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
         List<CommentGetAllResponse> commentGetAllResponse = comments.stream()
-                .map(CommentGetAllResponse::from)
-                .toList();
+                .map(comment -> {
+                    Long commentLikeCount = commentLikeRepository.countByCommentId(comment.getId());
+                    return CommentGetAllResponse.from(comment, commentLikeCount);
+                })
+                .collect(Collectors.toList());
         Long postLikeCount = postLikeRepository.countByPostId(post.getId());
 
         return PostGetOneResponse.from(post, postLikeCount, commentGetAllResponse);
