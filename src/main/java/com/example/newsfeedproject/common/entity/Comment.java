@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.xml.sax.ext.LexicalHandler;
 
 @Entity
 @Getter
@@ -32,7 +31,7 @@ public class Comment extends BaseEntity{
     @Column(nullable = false,  length = 100)
     private String comment;
 
-    private boolean isDelete = false;
+    private boolean isDeleted = false;
 
     // 생성자
     @Builder
@@ -48,7 +47,7 @@ public class Comment extends BaseEntity{
     }
 
     public void softDelete() {
-        this.isDelete = true;
+        this.isDeleted = true;
     }
 
 }

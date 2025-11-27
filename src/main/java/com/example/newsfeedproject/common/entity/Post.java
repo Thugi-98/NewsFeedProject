@@ -18,7 +18,7 @@ public class Post extends BaseEntity {
     private String title;
     @Column(length = 200)
     private String content;
-    private boolean isDelete = false;
+    private boolean isDeleted = false;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -47,6 +47,6 @@ public class Post extends BaseEntity {
      * 삭제기능
      */
     public void softDelete() {
-        this.isDelete = true;
+        this.isDeleted = true;
     }
 }
