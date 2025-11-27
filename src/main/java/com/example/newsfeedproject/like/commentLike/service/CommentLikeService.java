@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentLikeService {
 
@@ -26,7 +27,6 @@ public class CommentLikeService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    @Transactional
     public CommentLikeCreateResponse create(CustomUserDetails userDetails, Long commentId) {
 
         // 1. 접근 유저가 누구인지 확인
@@ -58,7 +58,7 @@ public class CommentLikeService {
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentLikeGetAllByCommentResponse> read(Long commentId) {
 
         // 1. commentId로 포스트 찾기
@@ -83,7 +83,6 @@ public class CommentLikeService {
 
     }
 
-    @Transactional
     public void delete(Long commentId, CustomUserDetails userDetails) {
 
         // 1. 접근 유저가 누구인지 확인
