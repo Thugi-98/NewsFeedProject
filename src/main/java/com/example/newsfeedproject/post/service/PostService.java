@@ -101,6 +101,7 @@ public class PostService {
         }
 
         post.update(request.getTitle(), request.getContent());
+        postRepository.flush();
 
         return PostUpdateResponse.from(post);
     }
