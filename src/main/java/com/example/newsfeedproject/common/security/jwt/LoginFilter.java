@@ -4,8 +4,6 @@ import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.security.utils.JwtUtil;
 import com.example.newsfeedproject.user.dto.request.LoginUserRequest;
-import com.example.newsfeedproject.common.dto.ApiResponse;
-import com.example.newsfeedproject.common.dto.ErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +17,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import tools.jackson.databind.ObjectMapper;
@@ -69,19 +66,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             // 실제 검증 수행
             // 이 메소드 호출 시, 내부적으로 UserDetailsService의 loadUserByUsername() 호출(비밀번호 일치까지 다 해줌)
             authentication = authenticationManager.authenticate(authToken);
-        } catch (UsernameNotFoundException e) {
-            log.error("[{}] {}", ErrorCode.NOT_FOUND_USER.name(), ErrorCode.NOT_FOUND_USER.getMessage());
-
-            CustomException customException = new CustomException(ErrorCode.NOT_FOUND_USER);
-
-            handlerExceptionResolver.resolveException(request, response, null, customException);
-
         } catch (BadCredentialsException e) {
-            log.error("[{}] {}", ErrorCode.PASSWORD_MISMATCH.name(), ErrorCode.PASSWORD_MISMATCH.getMessage());
+            log.error("[{}] {}", ErrorCode.NOT_FOUND_USER.name(), ErrorCode.LOGIN_FAIL.getMessage());
 
-            CustomException customException = new CustomException(ErrorCode.PASSWORD_MISMATCH);
+            CustomException customException = new CustomException(ErrorCode.LOGIN_FAIL);
 
             handlerExceptionResolver.resolveException(request, response, null, customException);
+
         } catch (Exception e) {
             log.error("[{}] {}", HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SEVER_ERROR.getMessage());
 

@@ -1,5 +1,7 @@
 package com.example.newsfeedproject.common.security.jwt;
 
+import com.example.newsfeedproject.common.exception.CustomException;
+import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.security.user.CustomUserDetailsService;
 import com.example.newsfeedproject.common.security.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -8,10 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -30,6 +34,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
+    // 컨트롤러 밖으로 던져진 예외를 해결
+    @Qualifier("handlerExceptionResolver")
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -46,8 +54,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // JWT 토큰 있는지 확인
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.info("JWT 토큰이 필요합니다.");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 필요합니다.");
+            log.error("[{}] {}", ErrorCode.NOT_FOUND_TOKEN.name(), ErrorCode.NOT_FOUND_TOKEN.getMessage());
+
+            CustomException customException = new CustomException(ErrorCode.NOT_FOUND_TOKEN);
+
+            handlerExceptionResolver.resolveException(request, response, null, customException);
             return;
         }
 
@@ -56,16 +67,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 가져오고 나서 Secret Key는 내가 만든게 맞는지 검증, 만료 기간 지났는지 검증
         if (!jwtUtil.validateToken(token)) {
-            log.error("토큰이 유효하지 않습니다.");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Unauthorized\"}");
-            return;
-        }
+            log.error("[{}] {}", ErrorCode.INVALID_TOKEN.name(), ErrorCode.INVALID_TOKEN.getMessage());
 
-        // token 소멸 시간 검증(유효 시간이 만료된 경우)
-        if (jwtUtil.isTokenExpired(token)) {
-            log.error("토큰 유효 기간이 만료 되었습니다.");
-            filterChain.doFilter(request, response);
+            CustomException customException = new CustomException(ErrorCode.INVALID_TOKEN);
+
+            handlerExceptionResolver.resolveException(request, response, null, customException);
             return;
         }
 

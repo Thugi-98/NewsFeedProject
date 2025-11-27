@@ -81,7 +81,7 @@ public class SecurityConfig {
         loginFilter.setFilterProcessesUrl("/login"); // 해당 필터가 /login 요청을 처리하도록 지정
 
         // JWT 인증 필터 (로그인 이후 매 요청마다 JWT 검증)
-        JwtFilter jwtFilter = new JwtFilter(jwtUtil, userDetailsService);
+        JwtFilter jwtFilter = new JwtFilter(jwtUtil, userDetailsService, handlerExceptionResolver);
 
         http
                 .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 보호 비활성화
