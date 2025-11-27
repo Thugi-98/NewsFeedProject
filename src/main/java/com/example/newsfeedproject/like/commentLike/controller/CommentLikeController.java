@@ -21,25 +21,25 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     /* 게시물에 좋아요 누르기 */
-    @PostMapping
+    @PostMapping("/{commentId)")
     public ResponseEntity<ApiResponse<CreateCommentLikeResponse>> likeApi(
-            @RequestParam Long commentId,
+            @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(commentLikeService.create(user, commentId)));
     }
 
     /* postId를 통해 좋아요 목록 확인하기*/
-    @GetMapping
+    @GetMapping("/{commentId)")
     public ResponseEntity<ApiResponse<List<ReadCommentLikeResponse>>> readLikeApi(
-            @RequestParam Long commentId
+            @PathVariable Long commentId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(commentLikeService.read(commentId)));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{commentId)")
     public ResponseEntity<ApiResponse<Void>> unlikeApi(
-            @RequestParam Long commentId,
+            @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         commentLikeService.delete(commentId, user);

@@ -21,25 +21,25 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
 
     /* 게시물에 좋아요 누르기 */
-    @PostMapping
+    @PostMapping("/{postId}")
     public ResponseEntity<ApiResponse<CreatePostLikeResponse>> likeApi(
-            @RequestParam Long postId,
+            @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(postLikeService.create(user, postId)));
     }
 
     /* postId를 통해 좋아요 목록 확인하기*/
-    @GetMapping
+    @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<List<ReadPostLikeResponse>>> readLikeApi(
-            @RequestParam Long postId
+            @PathVariable Long postId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postLikeService.read(postId)));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> unlikeApi(
-            @RequestParam Long postId,
+            @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         postLikeService.delete(postId, user);
