@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class UpdatePostRequest {
+public class PostUpdateRequest {
 
     @Size(min = 1, max = 100)
     private String title;

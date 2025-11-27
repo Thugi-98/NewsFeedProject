@@ -14,3 +14,4 @@ spring:
     defer-datasource-initialization: true
   jwt:
     secret-key: 486S69Ebrlj5HztNYOvkHrKTR77pwJKL1Vr6clQ6Ljo=
+    
