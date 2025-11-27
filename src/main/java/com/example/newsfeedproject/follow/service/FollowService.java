@@ -6,7 +6,7 @@ import com.example.newsfeedproject.common.entity.User;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.follow.dto.FollowCreateResponse;
-import com.example.newsfeedproject.follow.dto.FollowReadResponse;
+import com.example.newsfeedproject.follow.dto.FollowGetAllByUserResponse;
 import com.example.newsfeedproject.follow.repository.FollowRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +66,7 @@ public class FollowService {
 
     // READ - 특정 유저가 팔로우하는 유저 목록 확인하기
     @Transactional
-    public @Nullable List<FollowReadResponse> read(CustomUserDetails userDetails, Long targetId) {
+    public @Nullable List<FollowGetAllByUserResponse> read(CustomUserDetails userDetails, Long targetId) {
 
         // 1. 접근 유저가 누구인지 확인
         User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
@@ -81,10 +81,10 @@ public class FollowService {
         // 3-1. target이 본인인 경우, 혹은 targetId가 없는 경우 - 본인의 팔로우 목록 반환
         if (targetId == null || targetId.equals(user.getId())) {
 
-            List<FollowReadResponse> dtos = new ArrayList<>();
+            List<FollowGetAllByUserResponse> dtos = new ArrayList<>();
             for (Follow follow : follows) {
                 if (follow.getUser().getId().equals(user.getId()))
-                    dtos.add(new FollowReadResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail()));
+                    dtos.add(new FollowGetAllByUserResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail()));
             }
 
             return dtos;
@@ -105,10 +105,10 @@ public class FollowService {
         }
 
         // 3-2-3. target 팔로우 목록 공개
-        List<FollowReadResponse> dtos = new ArrayList<>();
+        List<FollowGetAllByUserResponse> dtos = new ArrayList<>();
         for (Follow follow : follows) {
             if (follow.getUser().getId().equals(target.getId()))
-                dtos.add(new FollowReadResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail()));
+                dtos.add(new FollowGetAllByUserResponse(follow.getId(), follow.getUser().getId(), follow.getTarget().getId(), follow.getTarget().getName(), follow.getTarget().getEmail()));
         }
 
         return dtos;

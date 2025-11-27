@@ -3,7 +3,7 @@ package com.example.newsfeedproject.like.commentLike.controller;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.like.commentLike.dto.CommentLikeCreateResponse;
-import com.example.newsfeedproject.like.commentLike.dto.CommentLikeReadResponse;
+import com.example.newsfeedproject.like.commentLike.dto.CommentLikeGetAllByCommentResponse;
 import com.example.newsfeedproject.like.commentLike.service.CommentLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class CommentLikeController {
 
     // commentId를 통해 좋아요 목록 확인하기
     @GetMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<List<CommentLikeReadResponse>>> readLikeApi(
+    public ResponseEntity<ApiResponse<List<CommentLikeGetAllByCommentResponse>>> readLikeApi(
             @PathVariable Long commentId
     ) {
         return ResponseEntity

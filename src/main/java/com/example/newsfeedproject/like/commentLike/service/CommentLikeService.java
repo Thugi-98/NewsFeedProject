@@ -7,7 +7,7 @@ import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
 import com.example.newsfeedproject.like.commentLike.dto.CommentLikeCreateResponse;
-import com.example.newsfeedproject.like.commentLike.dto.CommentLikeReadResponse;
+import com.example.newsfeedproject.like.commentLike.dto.CommentLikeGetAllByCommentResponse;
 import com.example.newsfeedproject.like.commentLike.repository.CommentLikeRepository;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.user.repository.UserRepository;
@@ -59,7 +59,7 @@ public class CommentLikeService {
     }
 
     @Transactional
-    public List<CommentLikeReadResponse> read(Long commentId) {
+    public List<CommentLikeGetAllByCommentResponse> read(Long commentId) {
 
         // 1. commentId로 포스트 찾기
         Comment comment = commentRepository.findById(commentId)
@@ -71,11 +71,11 @@ public class CommentLikeService {
         // 2. 해당 Comment의 좋아요 전부 출력하기
         List<CommentLike> commentLikes = commentLikeRepository.findAll();
 
-        List<CommentLikeReadResponse> dtos = new ArrayList<>();
+        List<CommentLikeGetAllByCommentResponse> dtos = new ArrayList<>();
 
         for (CommentLike commentLike : commentLikes) {
             if (commentLike.getComment().getId().equals(comment.getId())) {
-                dtos.add(new CommentLikeReadResponse(commentLike.getId(), commentLike.getComment().getId(), commentLike.getUser().getId()));
+                dtos.add(new CommentLikeGetAllByCommentResponse(commentLike.getId(), commentLike.getComment().getId(), commentLike.getUser().getId()));
             }
         }
 
