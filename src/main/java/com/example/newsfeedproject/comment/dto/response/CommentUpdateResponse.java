@@ -4,28 +4,22 @@ import com.example.newsfeedproject.common.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommentResponse {
+public class CommentUpdateResponse {
 
     private Long id;
-    private Long postId;
-    private String userName;
     private String comment;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static CommentResponse from(Comment comment) {
-        return CommentResponse.builder()
+    public static CommentUpdateResponse from(Comment comment) {
+        return CommentUpdateResponse.builder()
                 .id(comment.getId())
-                .postId(comment.getPost().getId())
-                .userName(comment.getUser().getName())
                 .comment(comment.getComment())
                 .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
