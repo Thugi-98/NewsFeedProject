@@ -67,7 +67,7 @@ public class CommentController {
         commentService.deleteComment(id, user);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(HttpStatus.NO_CONTENT)
             .build();
     }
 }
