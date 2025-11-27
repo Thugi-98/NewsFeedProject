@@ -47,7 +47,9 @@ public class PostController {
             @RequestParam(required = false, defaultValue = "false") boolean all,
             @RequestParam(required = false, defaultValue = "false") boolean onlyFollow
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getPosts(pageable, userId, user.getUsername(), all, onlyFollow)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(postService.getPosts(pageable, userId, user.getUserEmail(), all, onlyFollow)));
     }
 
     // 게시물 단건 조회 기능

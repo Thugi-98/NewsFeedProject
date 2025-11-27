@@ -49,7 +49,7 @@ public class PostService {
 
     // 게시물 전체 조회 기능
     @Transactional(readOnly = true)
-    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, boolean all, boolean onlyFollow) {
+    public Page<PostGetAllResponse> getPosts(Pageable pageable, Long userId, String email, boolean all, boolean onlyFollow) {
 
         // 페이징 없이 모든 게시물을 보기위한 조회
         PageRequest request;

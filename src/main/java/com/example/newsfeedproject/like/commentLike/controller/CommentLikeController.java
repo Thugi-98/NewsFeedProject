@@ -21,7 +21,7 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     /* 게시물에 좋아요 누르기 */
-    @PostMapping("/{commentId)")
+    @PostMapping("/{commentId}")
     public ResponseEntity<ApiResponse<CreateCommentLikeResponse>> likeApi(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
@@ -30,14 +30,14 @@ public class CommentLikeController {
     }
 
     /* postId를 통해 좋아요 목록 확인하기*/
-    @GetMapping("/{commentId)")
+    @GetMapping("/{commentId}")
     public ResponseEntity<ApiResponse<List<ReadCommentLikeResponse>>> readLikeApi(
             @PathVariable Long commentId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(commentLikeService.read(commentId)));
     }
 
-    @DeleteMapping("/{commentId)")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> unlikeApi(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
