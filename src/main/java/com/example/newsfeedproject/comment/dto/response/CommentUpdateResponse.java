@@ -14,12 +14,14 @@ public class CommentUpdateResponse {
 
     private Long id;
     private String comment;
+    private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public static CommentUpdateResponse from(Comment comment) {
         return CommentUpdateResponse.builder()
                 .id(comment.getId())
                 .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
                 .build();
     }

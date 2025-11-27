@@ -3,7 +3,8 @@ package com.example.newsfeedproject.comment.service;
 import com.example.newsfeedproject.comment.dto.request.CommentCreateRequest;
 import com.example.newsfeedproject.comment.dto.response.CommentCreateResponse;
 import com.example.newsfeedproject.comment.dto.request.CommentUpdateRequest;
-import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentGetAllResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentUpdateResponse;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.entity.Post;
@@ -49,7 +50,7 @@ public class CommentService {
 
     // 특정 게시글의 댓글 전체 조회
     @Transactional(readOnly = true)
-    public List<CommentGetResponse> getComment(Long postId) {
+    public List<CommentGetAllResponse> getComment(Long postId) {
 
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
@@ -60,12 +61,12 @@ public class CommentService {
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 
         return comments.stream()
-                .map(CommentGetResponse::from)
+                .map(CommentGetAllResponse::from)
                 .collect(Collectors.toList());
     }
 
     // 댓글 수정
-    public CommentCreateResponse updateComment(Long id, CommentUpdateRequest request, CustomUserDetails userDetails) {
+    public CommentUpdateResponse updateComment(Long id, CommentUpdateRequest request, CustomUserDetails userDetails) {
 
         Comment findComment = commentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
@@ -78,7 +79,7 @@ public class CommentService {
         findComment.update(request.getComment());
         commentRepository.flush();
 
-        return CommentCreateResponse.from(findComment);
+        return CommentUpdateResponse.from(findComment);
     }
 
     // 댓글 삭제 (소프트 딜리트)

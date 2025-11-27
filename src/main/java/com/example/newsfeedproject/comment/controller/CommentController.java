@@ -3,7 +3,8 @@ package com.example.newsfeedproject.comment.controller;
 import com.example.newsfeedproject.comment.dto.request.CommentCreateRequest;
 import com.example.newsfeedproject.comment.dto.response.CommentCreateResponse;
 import com.example.newsfeedproject.comment.dto.request.CommentUpdateRequest;
-import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentGetAllResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentUpdateResponse;
 import com.example.newsfeedproject.comment.service.CommentService;
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
@@ -37,19 +38,17 @@ public class CommentController {
 
     // 툭정 게시글의 댓글 전체 조회 API
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CommentGetResponse>>> getAllCommentApi(
+    public ResponseEntity<ApiResponse<List<CommentGetAllResponse>>> getAllCommentApi(
             @RequestParam Long postId) {
-
-        List<CommentGetResponse> comments = commentService.getComment(postId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(comments));
+                .body(ApiResponse.success(commentService.getComment(postId)));
     }
 
     // 댓글 수정 API
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CommentCreateResponse>> updateCommentApi(
+    public ResponseEntity<ApiResponse<CommentUpdateResponse>> updateCommentApi(
             @PathVariable Long id,
             @Valid @RequestBody CommentUpdateRequest request,
             @AuthenticationPrincipal CustomUserDetails user) {

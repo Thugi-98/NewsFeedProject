@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @Builder
-public class CommentGetResponse {
+public class CommentGetAllResponse {
 
     private Long id;
     private Long postId;
@@ -19,8 +19,8 @@ public class CommentGetResponse {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static CommentGetResponse from(Comment comment) {
-        return CommentGetResponse.builder()
+    public static CommentGetAllResponse from(Comment comment) {
+        return CommentGetAllResponse.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getName())

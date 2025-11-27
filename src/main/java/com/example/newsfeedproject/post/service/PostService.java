@@ -1,6 +1,6 @@
 package com.example.newsfeedproject.post.service;
 
-import com.example.newsfeedproject.comment.dto.response.CommentGetResponse;
+import com.example.newsfeedproject.comment.dto.response.CommentGetAllResponse;
 import com.example.newsfeedproject.comment.repository.CommentRepository;
 import com.example.newsfeedproject.common.entity.Comment;
 import com.example.newsfeedproject.common.exception.ErrorCode;
@@ -82,11 +82,11 @@ public class PostService {
 
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(post.getId());
 
-        List<CommentGetResponse> commentResponse = comments.stream()
-                .map(CommentGetResponse::from)
+        List<CommentGetAllResponse> commentGetAllResponse = comments.stream()
+                .map(CommentGetAllResponse::from)
                 .toList();
 
-        return PostGetOneResponse.from(post, commentResponses);
+        return PostGetOneResponse.from(post, commentGetAllResponse);
     }
 
     // 게시물 수정 기능
