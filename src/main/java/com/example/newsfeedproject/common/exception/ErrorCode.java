@@ -33,7 +33,11 @@ public enum ErrorCode {
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우중인 계정이 아닙니다."),
 
     ALREADY_POSTLIKE(HttpStatus.CONFLICT, "이미 좋아요를 표시한 게시글입니다."),
-    POSTLIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 표시한 게시물이 아닙니다.");
+    POSTLIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 표시한 게시물이 아닙니다."),
+
+    ALREADY_COMMENTLIKE(HttpStatus.CONFLICT, "이미 좋아요를 표시한 댓글입니다."),
+    COMMENTLIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 표시한 댓글이 아닙니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;
