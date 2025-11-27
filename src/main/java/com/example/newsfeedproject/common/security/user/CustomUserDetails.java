@@ -9,8 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * UserDetails를 구현한 클래스
- * User 엔티티를 Spring Security가 이해하는 UserDetails로 감싼다.
+ * Spring Security에서 사용자의 정보를 담는 클래스
  *
  * @author jiwon jung
  */
@@ -22,10 +21,6 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // 인가는 구현 x
-    }
-
-    public Long getUserId() {
-        return user.getId();
     }
 
     @Override
