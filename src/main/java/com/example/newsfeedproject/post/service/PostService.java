@@ -41,7 +41,7 @@ public class PostService {
      * @return
      */
     public CreatePostResponse save(CreatePostRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
