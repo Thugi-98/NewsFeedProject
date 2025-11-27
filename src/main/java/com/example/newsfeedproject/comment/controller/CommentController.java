@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 댓글 관련 REST API 요청을 처리하는 컨트롤러
- * 댓글 생성, 조회, 수정, 삭제 기능 제공
- */
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor

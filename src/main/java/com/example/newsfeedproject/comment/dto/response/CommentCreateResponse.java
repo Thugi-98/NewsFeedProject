@@ -7,9 +7,6 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-/**
- * 댓글 응답 DTO
- */
 @Getter
 @AllArgsConstructor
 @Builder
