@@ -33,7 +33,7 @@ public class CommentService {
     // 댓글 생성
     @Transactional
     public CommentResponse createComment(Long postId, CustomUserDetails userDetails,  CreateCommentRequest request) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUserEmail())
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_USER)
                 );
@@ -42,6 +42,9 @@ public class CommentService {
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_POST)
         );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
@@ -53,7 +56,13 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> readComment(Long postId) {
 
-        postRepository.findById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POST)
+        );
+        if (post.isDeleted()) {
+            throw new CustomException((ErrorCode.NOT_FOUND_POST));
+        }
 
         List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
 

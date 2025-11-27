@@ -13,4 +13,4 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
   jwt:
-    secret: "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo0NTY3OA==" # 반드시 최소 32자 이상 (서명에 사용할 Secret Key)
+    secret-key: 486S69Ebrlj5HztNYOvkHrKTR77pwJKL1Vr6clQ6Ljo=

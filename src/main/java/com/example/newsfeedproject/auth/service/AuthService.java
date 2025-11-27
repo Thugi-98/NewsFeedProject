@@ -1,10 +1,13 @@
-package com.example.newsfeedproject.user.service;
+package com.example.newsfeedproject.auth.service;
 
+import com.example.newsfeedproject.auth.dto.request.LoginUserRequest;
+import com.example.newsfeedproject.auth.dto.response.TokenResponse;
 import com.example.newsfeedproject.common.exception.CustomException;
 import com.example.newsfeedproject.common.exception.ErrorCode;
 import com.example.newsfeedproject.common.entity.User;
-import com.example.newsfeedproject.user.dto.request.CreateUserRequest;
-import com.example.newsfeedproject.user.dto.response.CreateUserResponse;
+import com.example.newsfeedproject.auth.dto.request.SignupUserRequest;
+import com.example.newsfeedproject.auth.dto.response.SignupUserResponse;
+import com.example.newsfeedproject.common.security.utils.JwtUtil;
 import com.example.newsfeedproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +27,13 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtUtil jwtUtil;
 
     /**
      * 회원가입을 합니다.
      */
     @Transactional
-    public CreateUserResponse signup(CreateUserRequest request) {
+    public SignupUserResponse signup(SignupUserRequest request) {
 
         // 이미 가입된 이메일일 경우 예외 발생
         if (userRepository.existsByEmail((request.getEmail()))) {
@@ -50,6 +54,27 @@ public class AuthService {
 
         userRepository.save(user);
 
-        return CreateUserResponse.from(user);
+        return SignupUserResponse.from(user);
+    }
+
+    /**
+     * 로그인을 합니다.
+     */
+    @Transactional
+    public TokenResponse login(LoginUserRequest request) {
+
+        // 요청 이메일로 가입된 유저가 있는지 확인
+        User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail())
+            .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAIL));
+
+        // 비밀번호가 일치하는지 확인
+        if (!bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.LOGIN_FAIL);
+        }
+
+        // JWT 토큰 발급
+        String token = jwtUtil.createJwt(user.getEmail());
+
+        return new TokenResponse(token);
     }
 }

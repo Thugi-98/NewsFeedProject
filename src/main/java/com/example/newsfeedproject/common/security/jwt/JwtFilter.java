@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -23,7 +24,7 @@ import java.util.Collections;
 /**
  * 클라이언트가 요청 시 보내는 JWT를 검증하여 사용자를 인증하고,
  * 인증된 사용자의 정보를 SecurityContextHolder에 저장한다.
- * ✅ 사용 시기: 로그인 이후 인증이 필요한 API 요청 시 작동
+ * 사용 시기: 로그인 이후 인증이 필요한 API 요청 시 작동
  *
  * @author jiwon jung
  */
@@ -54,9 +55,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // JWT 토큰 있는지 확인
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.error("[{}] {}", ErrorCode.NOT_FOUND_TOKEN.name(), ErrorCode.NOT_FOUND_TOKEN.getMessage());
+            log.error("[{}] {}", ErrorCode.UNAUTHENTICATE_USER.name(), ErrorCode.UNAUTHENTICATE_USER.getMessage());
 
-            CustomException customException = new CustomException(ErrorCode.NOT_FOUND_TOKEN);
+            CustomException customException = new CustomException(ErrorCode.UNAUTHENTICATE_USER);
 
             handlerExceptionResolver.resolveException(request, response, null, customException);
             return;
@@ -79,8 +80,19 @@ public class JwtFilter extends OncePerRequestFilter {
         // 최종적으로 token 검증 완료 -> 일시적인 session 생성
         String email = jwtUtil.extractEmail(token);
 
-        // 인증 완료된 유저 정보 가져오기
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UserDetails userDetails;
+
+        try {
+            // 인증 완료된 유저 정보 가져오기
+            userDetails = userDetailsService.loadUserByUsername(email);
+        } catch (UsernameNotFoundException e) {
+            log.error("[{}] {}", ErrorCode.NOT_FOUND_USER.name(), ErrorCode.NOT_FOUND_USER.getMessage());
+
+            CustomException customException = new CustomException(ErrorCode.NOT_FOUND_USER);
+
+            handlerExceptionResolver.resolveException(request, response, null, customException);
+            return;
+        }
 
         // credentials: 로그인 후 비밀번호 들고 있을 이유 x -> 보안상 null
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

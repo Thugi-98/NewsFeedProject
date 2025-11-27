@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //커스텀 예외처리
+    // 커스텀 예외처리
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e) {
 
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 e.getStatusCode().value(),                // HTTP status code
-                field != null ? (field.toUpperCase() + " VALIDATION ERROR") : "VALIDATION_ERROR", // 어떤 필드에서 오류 났는지 표시
+                field != null ? (field.toUpperCase() + "_VALIDATION_ERROR") : "VALIDATION_ERROR", // 어떤 필드에서 오류 났는지 표시
                 defaultMessage != null ? defaultMessage : "Invalid request" // 실제 메시지
         );
 
@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
     // 나머지 예외 서버에러 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        System.out.println(e.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

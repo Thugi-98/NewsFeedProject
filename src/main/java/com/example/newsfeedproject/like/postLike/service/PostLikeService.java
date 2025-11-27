@@ -30,7 +30,7 @@ public class PostLikeService {
     public CreatePostLikeResponse create(CustomUserDetails userDetails, Long postId) {
 
         /* 1. 접근 유저가 누구인지 확인 */
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
         if (user.isDeleted()) {
@@ -93,7 +93,7 @@ public class PostLikeService {
     public void delete(Long postId, CustomUserDetails userDetails) {
 
         /* 1. 접근 유저가 누구인지 확인 */
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.ACCESS_DENIED)
         );
         if (user.isDeleted()) {

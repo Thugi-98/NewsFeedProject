@@ -2,10 +2,11 @@ package com.example.newsfeedproject.user.controller;
 
 import com.example.newsfeedproject.common.dto.ApiResponse;
 import com.example.newsfeedproject.common.security.user.CustomUserDetails;
-import com.example.newsfeedproject.user.dto.request.DeleteUserRequest;
-import com.example.newsfeedproject.user.dto.request.UpdateUserRequest;
-import com.example.newsfeedproject.user.dto.response.ReadUserResponse;
-import com.example.newsfeedproject.user.dto.response.UpdateUserResponse;
+import com.example.newsfeedproject.user.dto.request.UserDeleteRequest;
+import com.example.newsfeedproject.user.dto.request.UserUpdateRequest;
+import com.example.newsfeedproject.user.dto.response.UserGetAllResponse;
+import com.example.newsfeedproject.user.dto.response.UserGetOneResponse;
+import com.example.newsfeedproject.user.dto.response.UserUpdateResponse;
 import com.example.newsfeedproject.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,37 +24,58 @@ public class UserController {
 
     private final UserService userService;
 
-    // 유저 조회 (선택 조회)
-    @GetMapping("/{Id}")
-    public ResponseEntity<ApiResponse<ReadUserResponse>> readUserApi(@PathVariable Long Id) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUser(Id)));
+
+    // 유저 ID로 선택 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserGetOneResponse>> getUserApi(
+            @PathVariable Long id) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(userService.getOne(id)));
+
     }
 
-    @GetMapping("/findUser")
-    public ResponseEntity<ApiResponse<List<ReadUserResponse>>> readUserByNameApi(@RequestParam("name") String name) {
-        List<ReadUserResponse> users = userService.findUserByName(name);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(users));
-    }
 
-    // 유저 조회 (전체 조회)
+    // 유저 전체 조회 (및 이름으로 조회) 통합
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ReadUserResponse>>> readUsersApi() {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.readUsers()));
+    public ResponseEntity<ApiResponse<List<UserGetAllResponse>>> getAllUserApi(
+            @RequestParam(value = "name", required = false) String name) {
+
+        List<UserGetAllResponse> users = userService.getAllUser(name);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(users));
+
     }
+
 
     // 유저 수정
-    @PutMapping("/{Id}")
-    public ResponseEntity<ApiResponse<UpdateUserResponse>> updateUserApi(@PathVariable Long Id,
-                                                                         @Valid @RequestBody UpdateUserRequest request,
-                                                                         @AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userService.updateUser(Id, request, user)));
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserApi(
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest request,
+            @AuthenticationPrincipal CustomUserDetails user) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(userService.updateUser(id, request, user)));
+
     }
+
 
     // 유저 삭제
     @DeleteMapping
-    public ResponseEntity<Void> deleteUserApi(@Valid @RequestBody DeleteUserRequest request,
-                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<Void> deleteUserApi(
+            @Valid @RequestBody UserDeleteRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
         userService.deleteUser(request, userDetails);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+
     }
 }
