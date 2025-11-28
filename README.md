@@ -126,8 +126,8 @@ com.example.newsfeedproject
 
 ## 데이터 구조
 
-- **ERD 및 상세 명세:** [ERD 링크](#)
-![ERD.png](./src/main/ERD.png)
+- **ERD 및 상세 명세:** [ERD 링크]([#](https://www.erdcloud.com/d/ZzYDqpv52LfAdz6an))
+![ProjectERD.png](ProjectERD.png)
 - 주요 테이블:
     - `User`: 유저 정보
     - `Post`: 게시물
